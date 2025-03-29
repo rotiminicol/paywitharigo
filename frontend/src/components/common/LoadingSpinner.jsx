@@ -1,6 +1,19 @@
-const LoadingSpinner = ({ size = "md" }) => {
-	const sizeClass = `loading-${size}`;
+import { motion } from "framer-motion";
 
-	return <span className={`loading loading-spinner ${sizeClass}`} />;
+const LoadingSpinner = ({ size = "md" }) => {
+  const sizeMap = {
+    xs: "loading-xs",
+    sm: "loading-sm",
+    md: "loading-md",
+    lg: "loading-lg",
+  };
+
+  return (
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      className={`loading loading-spinner ${sizeMap[size]} text-purple-500`}
+    />
+  );
 };
 export default LoadingSpinner;
