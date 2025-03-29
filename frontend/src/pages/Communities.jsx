@@ -1,6 +1,9 @@
 import { Search, Users, Hash, PlusCircle, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
 
 const CommunitiesPage = () => {
+  const [hoveredCard, setHoveredCard] = useState(null);
+  
   const communities = [
     {
       id: 1,
@@ -37,25 +40,25 @@ const CommunitiesPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 text-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="bg-gradient-to-r from-purple-900 to-black text-white">
         <div className="container mx-auto px-4 py-12">
           <div className="animate-fade-in-down">
-            <h1 className="text-3xl font-bold mb-2">Communities</h1>
-            <p className="text-blue-100 mb-8">Connect with like-minded people in specialized groups</p>
+            <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">Communities</h1>
+            <p className="text-purple-200 mb-8">Connect with like-minded people in specialized groups</p>
             
             {/* Search Bar */}
-            <div className="bg-white rounded-lg shadow-lg p-2 flex">
+            <div className="bg-gray-800 border border-purple-500 rounded-lg shadow-lg p-2 flex animate-slide-up" style={{animationDelay: "0.2s"}}>
               <div className="flex items-center flex-1 p-2">
-                <Search className="text-gray-400 mr-2" size={20} />
+                <Search className="text-purple-400 mr-2" size={20} />
                 <input 
                   type="text" 
                   placeholder="Search communities..."
-                  className="w-full outline-none text-gray-700" 
+                  className="w-full outline-none bg-transparent text-white placeholder-purple-300" 
                 />
               </div>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md m-2 transition-colors duration-300">
+              <button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-md m-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30">
                 Search
               </button>
             </div>
@@ -66,8 +69,8 @@ const CommunitiesPage = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Create Community Button */}
-        <div className="flex justify-end mb-6">
-          <button className="flex items-center bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-300">
+        <div className="flex justify-end mb-6 animate-fade-in" style={{animationDelay: "0.4s"}}>
+          <button className="flex items-center bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30">
             <PlusCircle className="mr-2" size={18} />
             Create Community
           </button>
@@ -75,36 +78,42 @@ const CommunitiesPage = () => {
 
         {/* Communities List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {communities.map(community => (
+          {communities.map((community, index) => (
             <div 
               key={community.id}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden animate-fade-in"
+              style={{animationDelay: `${0.5 + index * 0.1}s`}}
+              onMouseEnter={() => setHoveredCard(community.id)}
+              onMouseLeave={() => setHoveredCard(null)}
             >
               <div className="p-6">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 text-blue-600 rounded-md flex items-center justify-center text-xl mr-4">
+                  <div className={`flex-shrink-0 w-12 h-12 bg-purple-900 text-purple-300 rounded-md flex items-center justify-center text-xl mr-4 transition-all duration-300 ${hoveredCard === community.id ? 'scale-110' : ''}`}>
                     <Users size={24} />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{community.name}</h3>
-                        <p className="text-gray-600 text-sm">{community.description}</p>
+                        <h3 className="text-lg font-semibold text-gray-100">{community.name}</h3>
+                        <p className="text-gray-400 text-sm">{community.description}</p>
                       </div>
                       {!community.isPublic && (
-                        <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        <span className="bg-gray-700 text-gray-300 text-xs font-medium px-2.5 py-0.5 rounded-full">
                           Private
                         </span>
                       )}
                     </div>
                     
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md">
+                      <span className="inline-flex items-center text-xs font-medium bg-purple-900/50 text-purple-300 px-2.5 py-1 rounded-md">
                         <Users size={12} className="mr-1" />
                         {community.members.toLocaleString()} members
                       </span>
                       {community.tags.map(tag => (
-                        <span key={tag} className="inline-flex items-center text-xs font-medium bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md">
+                        <span 
+                          key={tag} 
+                          className="inline-flex items-center text-xs font-medium bg-gray-700 text-gray-300 px-2.5 py-1 rounded-md transition-all duration-300 hover:bg-purple-800 hover:text-purple-200"
+                        >
                           <Hash size={12} className="mr-1" />
                           {tag}
                         </span>
@@ -112,11 +121,15 @@ const CommunitiesPage = () => {
                     </div>
                     
                     <div className="mt-6 flex items-center justify-between">
-                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-300 flex items-center">
+                      <button 
+                        className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors duration-300 flex items-center hover:underline"
+                      >
                         <MessageSquare size={16} className="mr-1" />
                         View Discussions
                       </button>
-                      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors duration-300">
+                      <button 
+                        className={`bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${hoveredCard === community.id ? 'animate-pulse' : ''}`}
+                      >
                         Join
                       </button>
                     </div>
@@ -127,6 +140,8 @@ const CommunitiesPage = () => {
           ))}
         </div>
       </div>
+      
+    
     </div>
   );
 };

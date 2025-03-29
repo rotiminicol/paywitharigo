@@ -10,12 +10,13 @@ import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import JobPage from "./pages/Job";
-import ListsPage from "./pages/Job";
+import ListsPage from "./pages/List";
 import MonetizationPage from "./pages/Monetize";
 import PurchasesPage from "./pages/Purchase";
 import CommunitiesPage from "./pages/Communities";
 import SpacePage from "./pages/Space";
-
+import Search from "./pages/Search";
+import Miamour from "./pages/Miamour";
 function App() {
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -84,6 +85,14 @@ function App() {
           <Route
             path="/space"
             element={authUser ? <SpacePage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/search"
+            element={authUser ? <Search /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/miamour"
+            element={authUser ? <Miamour /> : <Navigate to="/login" />}
           />
         </Routes>
       </div>
