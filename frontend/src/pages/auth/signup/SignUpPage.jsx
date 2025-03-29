@@ -5,6 +5,7 @@ import { MdOutlineMail, MdPassword, MdDriveFileRenameOutline, MdLightbulbOutline
 import { FaUser } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { MdOutlineRemoveRedEye, MdOutlineVisibilityOff } from "react-icons/md";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const SignUpPage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const queryClient = useQueryClient();
   const gooContainerRef = useRef(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Goo effect blobs state
   const [blobs, setBlobs] = useState(() => 
@@ -346,8 +348,8 @@ const SignUpPage = () => {
                   <MdPassword className="text-xl" />
                 </span>
                 <input
-                  type="password"
-                  className="w-full bg-white/5 text-white placeholder-indigo-200/40 rounded-xl py-4 pl-12 pr-4 border border-white/10 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full bg-white/5 text-white placeholder-indigo-200/40 rounded-xl py-4 pl-12 pr-12 border border-white/10 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
                   placeholder="Create password"
                   name="password"
                   onChange={handleInputChange}
@@ -358,6 +360,17 @@ const SignUpPage = () => {
                   whileHover={{ width: "100%" }}
                   transition={{ duration: 0.3 }}
                 />
+                <button 
+                  type="button" 
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-300 hover:text-indigo-400 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <MdOutlineVisibilityOff className="text-xl" />
+                  ) : (
+                    <MdOutlineRemoveRedEye className="text-xl" />
+                  )}
+                </button>
               </label>
             </motion.div>
             

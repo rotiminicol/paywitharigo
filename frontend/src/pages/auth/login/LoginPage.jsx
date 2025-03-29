@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdOutlineMail, MdPassword, MdLightbulbOutline } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { MdOutlineRemoveRedEye, MdOutlineVisibilityOff } from "react-icons/md";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const LoginPage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const queryClient = useQueryClient();
   const gooContainerRef = useRef(null);
+    const [showPassword, setShowPassword] = useState(false);
 
   // Goo effect blobs state
   const [blobs, setBlobs] = useState(() => 
@@ -307,9 +309,9 @@ const LoginPage = () => {
                   <MdPassword className="text-xl" />
                 </span>
                 <input
-                  type="password"
-                  className="w-full bg-white/5 text-white placeholder-indigo-200/40 rounded-xl py-4 pl-12 pr-4 border border-white/10 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
-                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full bg-white/5 text-white placeholder-indigo-200/40 rounded-xl py-4 pl-12 pr-12 border border-white/10 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
+                  placeholder="Create password"
                   name="password"
                   onChange={handleInputChange}
                   value={formData.password}
@@ -319,6 +321,17 @@ const LoginPage = () => {
                   whileHover={{ width: "100%" }}
                   transition={{ duration: 0.3 }}
                 />
+                <button 
+                  type="button" 
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-300 hover:text-indigo-400 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <MdOutlineVisibilityOff className="text-xl" />
+                  ) : (
+                    <MdOutlineRemoveRedEye className="text-xl" />
+                  )}
+                </button>
               </label>
             </motion.div>
             
