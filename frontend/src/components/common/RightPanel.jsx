@@ -29,47 +29,62 @@ const RightPanel = () => {
     <motion.div 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, type: "spring" }}
       className="hidden lg:block my-4 mx-2 min-w-[300px]"
     >
-      <div className="bg-gray-900 p-4 rounded-xl sticky top-2 border border-gray-800 shadow-lg">
+      <div className="bg-gray-900 p-4 rounded-xl sticky top-2 border border-gray-800 shadow-lg backdrop-blur-sm">
         {/* Header */}
         <motion.div 
-          whileHover={{ x: 2 }}
-          className="flex items-center justify-between mb-4 pb-2 border-b border-purple-900"
+          whileHover={{ x: 3 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center justify-between mb-4 pb-2 border-b border-purple-900/50"
         >
-          <h2 className="font-bold text-xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <motion.h2 
+            className="font-bold text-xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+            animate={{
+              backgroundPosition: ['0% 50%', '100% 50%'],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "linear",
+            }}
+          >
             Who to follow
-          </h2>
-          <FiUsers className="text-purple-400" size={20} />
+          </motion.h2>
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          >
+            <FiUsers className="text-purple-400" size={20} />
+          </motion.div>
         </motion.div>
         
         {/* Content */}
         <div className="flex flex-col gap-3">
           {isLoading ? (
-            <>
-              <RightPanelSkeleton />
-              <RightPanelSkeleton />
-              <RightPanelSkeleton />
-            </>
+            <RightPanelSkeleton />
           ) : suggestedUsers?.length > 0 ? (
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {suggestedUsers.map((user) => (
                 <motion.div
                   key={user._id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  whileHover={{ scale: 1.02 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  whileHover={{ scale: 1.02, backgroundColor: "rgba(139, 92, 246, 0.05)" }}
+                  className="rounded-lg overflow-hidden"
                 >
                   <Link
                     to={`/profile/${user.username}`}
-                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-gray-800 hover:bg-gray-750 transition-all group"
+                    className="flex items-center justify-between gap-4 p-3 transition-all group"
                   >
                     <div className="flex gap-3 items-center">
                       <motion.div 
-                        whileHover={{ rotate: 5 }}
+                        whileHover={{ rotate: 5, scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         className="relative w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 p-0.5"
                       >
                         <img 
@@ -86,9 +101,12 @@ const RightPanel = () => {
                       </div>
                     </div>
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        background: "linear-gradient(to right, #7e22ce, #ec4899)"
+                      }}
                       whileTap={{ scale: 0.95 }}
-                      className="btn bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 rounded-full btn-sm flex items-center gap-1 border-none"
+                      className="btn bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full btn-sm flex items-center gap-1 border-none shadow-lg shadow-purple-900/30"
                       onClick={(e) => {
                         e.preventDefault();
                         follow(user._id);
@@ -110,20 +128,27 @@ const RightPanel = () => {
             </AnimatePresence>
           ) : (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring" }}
               className="text-center p-6 rounded-lg bg-gray-800/50 border border-dashed border-purple-900/50"
             >
-              <div className="text-purple-400 mb-3">
+              <motion.div 
+                className="text-purple-400 mb-3"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
                 <FiUsers className="mx-auto" size={28} />
-              </div>
+              </motion.div>
               <h3 className="text-gray-300 font-medium">No suggestions yet</h3>
               <p className="text-sm text-gray-500 mt-1">
                 Follow more people to get recommendations
               </p>
               <motion.button
-                whileHover={{ scale: 1.03 }}
+                whileHover={{ 
+                  scale: 1.03,
+                  color: "#e879f9"
+                }}
                 whileTap={{ scale: 0.97 }}
                 className="mt-4 text-sm flex items-center justify-center gap-1 mx-auto text-purple-400 hover:text-purple-300"
               >
@@ -135,8 +160,8 @@ const RightPanel = () => {
 
         {/* Footer */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="mt-6 pt-4 border-t border-gray-800"
         >
@@ -144,7 +169,12 @@ const RightPanel = () => {
             {["Terms", "Privacy", "Cookies", "More"].map((item) => (
               <motion.a
                 key={item}
-                whileHover={{ scale: 1.05, color: "#E879F9" }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  color: "#e879f9",
+                  textShadow: "0 0 8px rgba(232, 121, 249, 0.4)"
+                }}
+                whileTap={{ scale: 0.95 }}
                 href="#"
                 className="text-gray-400 hover:text-purple-400 transition-colors"
               >
@@ -152,9 +182,18 @@ const RightPanel = () => {
               </motion.a>
             ))}
           </div>
-          <p className="text-xs text-gray-600 text-center mt-3">
+          <motion.p 
+            className="text-xs text-gray-600 text-center mt-3"
+            animate={{
+              opacity: [0.6, 1, 0.6],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+            }}
+          >
             © {new Date().getFullYear()} Miamour
-          </p>
+          </motion.p>
         </motion.div>
       </div>
     </motion.div>

@@ -125,7 +125,7 @@ const Sidebar = () => {
             )}
 
             {/* Navigation Menu */}
-            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide smooth-scroll" >
               <ul className="flex flex-col gap-2">
                 {navigationItems.map((item) => {
                   const isActive = location.pathname === item.path || 

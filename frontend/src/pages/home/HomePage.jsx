@@ -62,11 +62,12 @@ const HomePage = () => {
 
 				{/* POSTS with staggered animation */}
 				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ duration: 0.5, delay: 0.2 }}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.5, delay: 0.2 }}
+				className="overflow-y-auto scrollbar-hide" // Add this class
 				>
-					<Posts feedType={feedType} />
+				<Posts feedType={feedType} />
 				</motion.div>
 			</div>
 		</>
