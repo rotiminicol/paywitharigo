@@ -142,28 +142,32 @@ const ProfilePage = () => {
 								/>
 								<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-b-lg"></div>
 								{isMyProfile && (
-									<motion.div
+										<motion.div
 										initial={{ opacity: 1 }}
-										animate={{ 
-											scale: [1, 1.1, 1],
-											boxShadow: ["0px 0px 0px rgba(168, 85, 247, 0)", "0px 0px 8px rgba(168, 85, 247, 0.5)", "0px 0px 0px rgba(168, 85, 247, 0)"]
+										animate={{
+										scale: [1, 1.1, 1],
+										boxShadow: [
+											"0px 0px 0px rgba(168, 85, 247, 0)",
+											"0px 0px 8px rgba(168, 85, 247, 0.5)",
+											"0px 0px 0px rgba(168, 85, 247, 0)",
+										],
 										}}
-										transition={{ 
-											duration: 2, 
-											repeat: Infinity, 
-											repeatType: "reverse" 
+										transition={{
+										duration: 2,
+										repeat: Infinity,
+										repeatType: "reverse",
 										}}
-										whileHover={{ 
-											scale: 1.2, 
-											backgroundColor: "rgba(168, 85, 247, 0.8)",
-											boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)"
+										whileHover={{
+										scale: 1.2,
+										backgroundColor: "rgba(168, 85, 247, 0.8)",
+										boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)",
 										}}
-										className='absolute top-2 right-2 rounded-full p-2 bg-gray-900/80 cursor-pointer transition duration-200 border border-purple-500'
+										className="absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full bg-gray-900/80 cursor-pointer transition duration-200 border border-purple-500"
 										onClick={() => coverImgRef.current.click()}
 									>
-										<MdEdit className='w-5 h-5 text-purple-300' />
+										<MdEdit className="w-5 h-5 text-purple-300" />
 									</motion.div>
-								)}
+					)}
 
 								<input
 									type='file'
@@ -188,10 +192,10 @@ const ProfilePage = () => {
 									onMouseEnter={() => isMyProfile && setShowProfileHint(true)}
 									onMouseLeave={() => setShowProfileHint(false)}
 								>
-									<div className='w-32 rounded-full relative group/avatar shadow-lg border-4 border-purple-600/90 hover:border-purple-500 transition-all duration-300'>
+									<div className='w-32 h-32 rounded-full relative group/avatar shadow-lg border-4 border-purple-600/90 hover:border-purple-500 transition-all duration-300'>
 										<motion.img 
 											src={profileImg || user?.profileImg || "/avatar-placeholder.png"} 
-											className="group-hover/avatar:brightness-110 transition-all duration-300"
+											className="group-hover/avatar:brightness-110 transition-all duration-300 w-full h-full object-cover rounded-full"
 											whileHover={{ scale: 1.05 }}
 										/>
 										<AnimatePresence>
@@ -208,27 +212,28 @@ const ProfilePage = () => {
 										</AnimatePresence>
 										{isMyProfile && (
 											<motion.div 
-												initial={{ opacity: 1 }}
-												animate={{ 
-													scale: [1, 1.1, 1],
-													boxShadow: ["0px 0px 0px rgba(168, 85, 247, 0)", "0px 0px 8px rgba(168, 85, 247, 0.5)", "0px 0px 0px rgba(168, 85, 247, 0)"]
-												}}
-												transition={{ 
-													duration: 2, 
-													repeat: Infinity, 
-													repeatType: "reverse",
-													delay: 1 
-												}}
-												whileHover={{ 
-													scale: 1.2, 
-													backgroundColor: "rgba(168, 85, 247, 0.8)",
-													boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)"
-												}}
-												className='absolute top-5 right-3 p-1 bg-purple-600 rounded-full cursor-pointer border border-white/90'
-												onClick={() => profileImgRef.current.click()}
-											>
-												<MdEdit className='w-4 h-4 text-white' />
-											</motion.div>
+											initial={{ opacity: 1 }}
+											animate={{ 
+											scale: [1, 1.1, 1],
+											boxShadow: ["0px 0px 0px rgba(168, 85, 247, 0)", "0px 0px 8px rgba(168, 85, 247, 0.5)", "0px 0px 0px rgba(168, 85, 247, 0)"]
+											}}
+											transition={{ 
+											duration: 2, 
+											repeat: Infinity, 
+											repeatType: "reverse",
+											delay: 1 
+											}}
+											whileHover={{ 
+											scale: 1.2, 
+											backgroundColor: "rgba(168, 85, 247, 0.8)",
+											boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)"
+											}}
+											className='absolute top-5 right-3 p-1 bg-purple-600 rounded-full cursor-pointer border border-white/90 flex items-center justify-center'
+											style={{ width: "24px", height: "24px" }}
+											onClick={() => profileImgRef.current.click()}
+										>
+											<MdEdit className='w-4 h-4 text-white' />
+										</motion.div>
 										)}
 									</div>
 								</motion.div>

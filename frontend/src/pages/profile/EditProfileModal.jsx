@@ -44,173 +44,182 @@ const EditProfileModal = ({ authUser }) => {
   return (
     <>
       <motion.button
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, backgroundColor: "#2D1A45" }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-50 transition-colors duration-300 flex items-center"
+        className="px-4 py-2 rounded-full border border-purple-400 text-purple-400 bg-black hover:text-white transition-colors duration-300 flex items-center"
       >
         <Edit3 size={16} className="mr-2" />
         Edit profile
       </motion.button>
-
+  
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4"
           >
             <motion.dialog
               open
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              initial={{ scale: 0.9, y: 30, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
-              className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-purple-100"
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="bg-black rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-purple-500"
             >
               <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold text-purple-800">Update Profile</h3>
-                  <button
+                <div className="flex justify-between items-center mb-8">
+                  <motion.h3 
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-2xl font-bold text-purple-300"
+                  >
+                    Update Profile
+                  </motion.h3>
+                  <motion.button
+                    whileHover={{ rotate: 90 }}
+                    transition={{ duration: 0.2 }}
                     onClick={() => setIsOpen(false)}
-                    className="text-gray-400 hover:text-purple-600 transition-colors"
+                    className="text-purple-400 hover:text-white transition-colors"
                   >
                     <X size={24} />
-                  </button>
+                  </motion.button>
                 </div>
-
+  
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.15 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <User className="text-purple-600" size={18} />
+                    <User className="text-purple-500" size={18} />
                     <input
                       type="text"
                       placeholder="Full Name"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.fullName}
                       name="fullName"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <User className="text-purple-600" size={18} />
+                    <User className="text-purple-500" size={18} />
                     <input
                       type="text"
                       placeholder="Username"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.username}
                       name="username"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.25 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <Mail className="text-purple-600" size={18} />
+                    <Mail className="text-purple-500" size={18} />
                     <input
                       type="email"
                       placeholder="Email"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.email}
                       name="email"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.3 }}
+                    className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <Edit3 className="text-purple-600 mt-1" size={18} />
+                    <Edit3 className="text-purple-500 mt-1" size={18} />
                     <textarea
                       placeholder="Bio"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 min-h-[80px] resize-none"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500 min-h-[80px] resize-none"
                       value={formData.bio}
                       name="bio"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.35 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <LinkIcon className="text-purple-600" size={18} />
+                    <LinkIcon className="text-purple-500" size={18} />
                     <input
                       type="text"
                       placeholder="Website Link"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.link}
                       name="link"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.4 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <Lock className="text-purple-600" size={18} />
+                    <Lock className="text-purple-500" size={18} />
                     <input
                       type="password"
                       placeholder="Current Password"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.currentPassword}
                       name="currentPassword"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
+                    transition={{ delay: 0.45 }}
+                    className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg border border-purple-900 group hover:border-purple-500 transition-all duration-300"
                   >
-                    <Lock className="text-purple-600" size={18} />
+                    <Lock className="text-purple-500" size={18} />
                     <input
                       type="password"
                       placeholder="New Password"
-                      className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+                      className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
                       value={formData.newPassword}
                       name="newPassword"
                       onChange={handleInputChange}
                     />
                   </motion.div>
-
+  
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45 }}
-                    className="pt-4"
+                    transition={{ delay: 0.5 }}
+                    className="pt-6"
                   >
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)" }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
                       disabled={isUpdatingProfile}
-                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                      className="w-full bg-gradient-to-r from-purple-800 to-purple-600 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
                     >
                       {isUpdatingProfile ? (
                         <span className="flex items-center justify-center">
@@ -221,7 +230,15 @@ const EditProfileModal = ({ authUser }) => {
                           Updating...
                         </span>
                       ) : (
-                        "Update Profile"
+                        <span className="flex items-center justify-center">
+                          <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                          >
+                            Update Profile
+                          </motion.span>
+                        </span>
                       )}
                     </motion.button>
                   </motion.div>

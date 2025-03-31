@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { MdOutlineMail, MdPassword, MdLightbulbOutline } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdOutlineRemoveRedEye, MdOutlineVisibilityOff } from "react-icons/md";
@@ -14,7 +14,32 @@ const LoginPage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const queryClient = useQueryClient();
   const gooContainerRef = useRef(null);
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const formRef = useRef(null);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
+
+  // Parallax effect values
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  // Transform mouse movement to rotation values
+  const rotateX = useTransform(mouseY, [0, windowSize.height], [10, -10]);
+  const rotateY = useTransform(mouseX, [0, windowSize.width], [-10, 10]);
+
+  // 3D elements state
+  const [particles, setParticles] = useState(() => 
+    Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      z: Math.random() * 500 - 250,
+      size: Math.random() * 4 + 1,
+      speed: Math.random() * 0.4 + 0.1,
+    }))
+  );
 
   // Goo effect blobs state
   const [blobs, setBlobs] = useState(() => 
@@ -66,9 +91,25 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Window resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Mouse movement tracker for interactive effects
   useEffect(() => {
     const handleMouseMove = (e) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      
       setMousePosition({
         x: e.clientX,
         y: e.clientY
@@ -77,6 +118,31 @@ const LoginPage = () => {
     
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  // Animate 3D particles
+  useEffect(() => {
+    const animateParticles = () => {
+      setParticles(prevParticles => 
+        prevParticles.map(particle => {
+          // Move particles in 3D space
+          let newZ = particle.z + particle.speed;
+          
+          // Reset particles when they get too close to the viewer
+          if (newZ > 250) {
+            newZ = -250;
+          }
+          
+          return {
+            ...particle,
+            z: newZ,
+          };
+        })
+      );
+    };
+    
+    const particleIntervalId = setInterval(animateParticles, 16);
+    return () => clearInterval(particleIntervalId);
   }, []);
 
   // Animate goo blobs
@@ -120,7 +186,7 @@ const LoginPage = () => {
   }, [mousePosition]);
 
   return (
-    <div className="min-h-screen w-full overflow-hidden relative bg-slate-900">
+    <div className="min-h-screen w-full overflow-hidden relative bg-slate-900 perspective-1000">
       {/* SVG filter for goo effect */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <filter id="goo">
@@ -129,6 +195,36 @@ const LoginPage = () => {
           <feComposite in="SourceGraphic" in2="goo" operator="atop" />
         </filter>
       </svg>
+      
+      {/* 3D Particles for depth */}
+      <div className="absolute inset-0 overflow-hidden" style={{ perspective: '1000px' }}>
+        {particles.map(particle => {
+          // Calculate apparent size based on z-position (perspective effect)
+          const scale = Math.max(0.1, (500 - Math.abs(particle.z)) / 500);
+          // Calculate screen position
+          const x = (particle.x - 50) * scale + 50;
+          const y = (particle.y - 50) * scale + 50;
+          // Calculate opacity based on z-position
+          const opacity = Math.max(0.1, Math.min(0.8, (500 - Math.abs(particle.z)) / 500));
+          
+          return (
+            <motion.div
+              key={particle.id}
+              className="absolute rounded-full bg-indigo-400"
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                width: `${particle.size * scale}px`,
+                height: `${particle.size * scale}px`,
+                opacity: opacity,
+                filter: 'blur(1px)',
+                transform: 'translate(-50%, -50%)',
+                zIndex: Math.floor((particle.z + 250) / 500 * 10) - 10,
+              }}
+            />
+          );
+        })}
+      </div>
       
       {/* Background gradient with goo effect */}
       <div 
@@ -175,24 +271,32 @@ const LoginPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
+          style={{
+            transformStyle: 'preserve-3d',
+          }}
         >
           <motion.div
             className="relative mb-16"
+            style={{
+              transformStyle: 'preserve-3d',
+              transform: 'perspective(1000px)',
+            }}
             animate={{
               y: [0, -10, 0],
+              rotateY: [0, 5, 0, -5, 0],
             }}
             transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
+              y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+              rotateY: { duration: 10, repeat: Infinity, ease: "easeInOut" },
             }}
           >
-            <div className="relative z-10 text-center">
+            <div className="relative z-10 text-center" style={{ transformStyle: 'preserve-3d' }}>
               <motion.div 
                 className="text-7xl font-bold text-white mb-3"
                 initial={{ scale: 0.9, filter: "blur(8px)" }}
                 animate={{ scale: 1, filter: "blur(0px)" }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
+                style={{ transform: 'translateZ(40px)' }}
               >
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-300">
                   iJuewa
@@ -203,6 +307,7 @@ const LoginPage = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
+                style={{ transform: 'translateZ(20px)' }}
               >
                Share your memories, Tell your stories, Get Inspired
               </motion.div>
@@ -213,22 +318,25 @@ const LoginPage = () => {
               className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl"
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.4, 0.6, 0.4]
+                opacity: [0.4, 0.6, 0.4],
+                rotateZ: [0, 10, 0, -10, 0],
               }}
               transition={{
                 duration: 8,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
+              style={{ transform: 'translateZ(-20px)' }}
             />
           </motion.div>
           
-          {/* Feature highlights */}
+          {/* Feature highlights with 3D effect */}
           <motion.div 
             className="grid grid-cols-2 gap-6 max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.8 }}
+            style={{ perspective: '1000px' }}
           >
             {[
               { title: "Connect", desc: "Network with experts in your field" },
@@ -239,14 +347,21 @@ const LoginPage = () => {
               <motion.div
                 key={index}
                 className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm group"
-                whileHover={{ y: -5, backgroundColor: "rgba(255,255,255,0.08)" }}
+                whileHover={{ 
+                  y: -5, 
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  rotateX: 10,
+                  rotateY: index % 2 === 0 ? -10 : 10,
+                  z: 30,
+                }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                style={{ transformStyle: 'preserve-3d' }}
               >
-                <div className="text-indigo-300 text-2xl mb-3 group-hover:text-indigo-200 transition-colors">
+                <div className="text-indigo-300 text-2xl mb-3 group-hover:text-indigo-200 transition-colors" style={{ transform: 'translateZ(10px)' }}>
                   <MdLightbulbOutline />
                 </div>
-                <h3 className="text-white font-medium text-lg">{item.title}</h3>
-                <p className="text-white/60 text-sm mt-2 group-hover:text-white/80 transition-colors">
+                <h3 className="text-white font-medium text-lg" style={{ transform: 'translateZ(15px)' }}>{item.title}</h3>
+                <p className="text-white/60 text-sm mt-2 group-hover:text-white/80 transition-colors" style={{ transform: 'translateZ(5px)' }}>
                   {item.desc}
                 </p>
               </motion.div>
@@ -254,7 +369,7 @@ const LoginPage = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Side - Form */}
+        {/* Right Side - Form with 3D effect */}
         <motion.div 
           className="flex-1 flex flex-col justify-center items-center p-6"
           initial={{ opacity: 0 }}
@@ -262,18 +377,35 @@ const LoginPage = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.form 
+            ref={formRef}
             className="flex gap-6 flex-col w-full max-w-md p-10 rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-xl"
             onSubmit={handleSubmit}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             whileHover={{ boxShadow: "0 25px 50px -12px rgba(79, 70, 229, 0.15)" }}
+            style={{
+              transformStyle: 'preserve-3d',
+              rotateX: rotateX,
+              rotateY: rotateY,
+            }}
           >
+            {/* Floating 3D form elements */}
+            <motion.div
+              className="absolute -inset-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-3xl blur-md"
+              style={{ 
+                transform: 'translateZ(-20px)', 
+                transformStyle: 'preserve-3d',
+                zIndex: -1
+              }}
+            />
+            
             <motion.h1 
               className="text-2xl font-semibold text-white text-center mb-8"
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
+              style={{ transform: 'translateZ(25px)' }}
             >
               <span className="block text-lg text-indigo-300 mb-1 font-light">Welcome back to</span>
               Your Knowledge Community
@@ -284,8 +416,9 @@ const LoginPage = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.6 }}
               className="space-y-6"
+              style={{ transformStyle: 'preserve-3d' }}
             >
-              <label className="group relative block">
+              <label className="group relative block" style={{ transform: 'translateZ(15px)' }}>
                 <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-indigo-300 group-focus-within:text-indigo-400 transition-colors">
                   <MdOutlineMail className="text-xl" />
                 </span>
@@ -304,7 +437,7 @@ const LoginPage = () => {
                 />
               </label>
               
-              <label className="group relative block">
+              <label className="group relative block" style={{ transform: 'translateZ(15px)' }}>
                 <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-indigo-300 group-focus-within:text-indigo-400 transition-colors">
                   <MdPassword className="text-xl" />
                 </span>
@@ -340,6 +473,7 @@ const LoginPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6 }}
+              style={{ transform: 'translateZ(10px)' }}
             >
               <Link 
                 to="/forgot-password" 
@@ -355,6 +489,7 @@ const LoginPage = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.6 }}
               className="mt-2"
+              style={{ transform: 'translateZ(30px)' }}
             >
               <motion.button 
                 className="w-full py-4 rounded-xl text-white border-none transition-all duration-300 overflow-hidden relative"
@@ -362,8 +497,11 @@ const LoginPage = () => {
                 onHoverStart={() => setIsHovered(true)}
                 onHoverEnd={() => setIsHovered(false)}
                 whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
                 style={{
-                  background: "linear-gradient(90deg, rgba(79, 70, 229, 1) 0%, rgba(124, 58, 237, 1) 100%)"
+                  background: "linear-gradient(90deg, rgba(79, 70, 229, 1) 0%, rgba(124, 58, 237, 1) 100%)",
+                  transformStyle: 'preserve-3d',
+                  boxShadow: '0 10px 30px -10px rgba(79, 70, 229, 0.5)',
                 }}
               >
                 <span className="relative z-10 font-medium text-lg">
@@ -381,7 +519,7 @@ const LoginPage = () => {
                   )}
                 </span>
                 
-                {/* Button hover effect with pseudo goo */}
+                {/* 3D button hover effect with pseudo goo */}
                 <AnimatePresence>
                   {isHovered && (
                     <motion.div 
@@ -398,6 +536,7 @@ const LoginPage = () => {
                             width: 20 + i * 15,
                             height: 20 + i * 15,
                             filter: 'blur(8px)',
+                            transform: `translateZ(${5 * (i + 1)}px)`,
                           }}
                           animate={{
                             x: [
@@ -428,6 +567,7 @@ const LoginPage = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
+                  style={{ transform: 'translateZ(10px)' }}
                 >
                   {error.message}
                 </motion.p>
@@ -445,8 +585,14 @@ const LoginPage = () => {
             <Link to="/signup" className="w-full">
               <motion.button 
                 className="py-3 rounded-xl w-full text-white border border-indigo-500/30 bg-white/5 hover:bg-indigo-500/10 hover:border-indigo-400 transition-all duration-300"
-                whileHover={{ scale: 1.02, borderColor: "rgba(99, 102, 241, 0.5)" }}
+                whileHover={{ 
+                  scale: 1.02, 
+                  borderColor: "rgba(99, 102, 241, 0.5)",
+                  rotateX: 5,
+                  y: -5,
+                }}
                 whileTap={{ scale: 0.98 }}
+                style={{ transformStyle: 'preserve-3d' }}
               >
                 Create an account
               </motion.button>

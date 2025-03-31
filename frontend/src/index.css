@@ -60,3 +60,10 @@
 .smooth-scroll {
   scroll-behavior: smooth;
 }
+@layer base {
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+

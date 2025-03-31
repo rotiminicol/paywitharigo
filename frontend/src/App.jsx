@@ -17,6 +17,8 @@ import CommunitiesPage from "./pages/Communities";
 import SpacePage from "./pages/Space";
 import Search from "./pages/Search";
 import Miamour from "./pages/Miamour";
+import Verification from "./pages/Verification"
+
 function App() {
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -52,7 +54,8 @@ function App() {
         <Routes>
           <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
           <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
-          <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
+          <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/verification" />} />
+          <Route path="/verification" element={authUser ? <Verification /> : <Navigate to="/" />} />
           <Route
             path="/notifications"
             element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
