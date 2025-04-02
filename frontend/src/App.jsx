@@ -17,7 +17,7 @@ import CommunitiesPage from "./pages/Communities";
 import SpacePage from "./pages/Space";
 import Search from "./pages/Search";
 import Miamour from "./pages/Miamour";
-import Verification from "./pages/Verification"
+import Verification from "./pages/Verification";
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -41,14 +41,14 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center bg-black">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-screen w-full bg-gradient-to-br from-black to-purple-900">
       {authUser && <Sidebar />}
       <div className="flex-1 overflow-y-auto">
         <Routes>
@@ -64,7 +64,6 @@ function App() {
             path="/profile/:username"
             element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
           />
-          {/* New Routes */}
           <Route
             path="/jobs"
             element={authUser ? <JobPage /> : <Navigate to="/login" />}
