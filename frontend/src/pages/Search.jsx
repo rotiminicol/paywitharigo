@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiUser, FiPlus } from 'react-icons/fi';
 import { FaHeart } from 'react-icons/fa';
@@ -71,19 +71,19 @@ const Search = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gray-900 text-gray-100 p-4 md:p-8"
+      className="min-h-screen bg-gray-900 text-gray-100 p-3 sm:p-4 md:p-8"
     >
       <div className="max-w-4xl mx-auto">
         {/* Search Header */}
         <motion.div 
           initial={{ y: -20 }}
           animate={{ y: 0 }}
-          className="mb-8"
+          className="mb-4 sm:mb-8"
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             Discover People
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-sm sm:text-base text-gray-400 mt-1 sm:mt-2">
             Find and connect with interesting people around the world
           </p>
         </motion.div>
@@ -94,24 +94,24 @@ const Search = () => {
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="relative mb-8"
+          className="relative mb-6 sm:mb-8"
         >
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
+            <FiSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-purple-400" size={18} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by username or name..."
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl py-3 pl-12 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg sm:rounded-xl py-2 sm:py-3 pl-10 sm:pl-12 pr-8 sm:pr-10 text-sm sm:text-base text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
               >
-                <FiX size={20} />
+                <FiX size={18} />
               </button>
             )}
           </div>
@@ -119,7 +119,7 @@ const Search = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-purple-500/20 transition-all duration-300"
+            className="mt-3 sm:mt-4 w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-purple-500/20 transition-all duration-300"
           >
             Search
           </motion.button>
@@ -132,34 +132,34 @@ const Search = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8"
+              className="mb-6 sm:mb-8"
             >
-              <h2 className="text-xl font-semibold mb-4 text-purple-300">Search Results</h2>
-              <div className="space-y-4">
+              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-purple-300">Search Results</h2>
+              <div className="space-y-3 sm:space-y-4">
                 {searchResults.map((user) => (
                   <motion.div
                     key={user.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-gray-800 rounded-xl p-4 flex items-center justify-between border border-gray-700 hover:border-purple-500 transition-colors duration-300"
+                    className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 border border-gray-700 hover:border-purple-500 transition-colors duration-300"
                   >
-                    <div className="flex items-center">
-                      <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 p-0.5 mr-4">
+                    <div className="flex items-center w-full sm:w-auto">
+                      <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 p-0.5 mr-3 sm:mr-4">
                         <div className="w-full h-full rounded-full bg-gray-800 overflow-hidden">
                           <FiUser className="w-full h-full p-2 text-purple-300" />
                         </div>
                       </div>
                       <div>
-                        <h3 className="font-medium">{user.name}</h3>
-                        <p className="text-gray-400 text-sm">@{user.username}</p>
+                        <h3 className="font-medium text-sm sm:text-base">{user.name}</h3>
+                        <p className="text-gray-400 text-xs sm:text-sm">@{user.username}</p>
                       </div>
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => toggleFollow(user.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${user.isFollowing ? 'bg-gray-700 text-gray-300' : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'}`}
+                      className={`flex items-center justify-center space-x-2 px-4 py-1.5 sm:py-2 rounded-full sm:rounded-lg text-sm w-full sm:w-auto ${user.isFollowing ? 'bg-gray-700 text-gray-300' : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'}`}
                     >
                       {user.isFollowing ? (
                         <>
@@ -185,47 +185,47 @@ const Search = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="mb-8"
+                  className="mb-6 sm:mb-8"
                 >
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-purple-300">Recent Searches</h2>
+                  <div className="flex justify-between items-center mb-3 sm:mb-4">
+                    <h2 className="text-lg sm:text-xl font-semibold text-purple-300">Recent Searches</h2>
                     <button 
                       onClick={() => setRecentSearches([])}
-                      className="text-gray-400 hover:text-purple-400 text-sm"
+                      className="text-gray-400 hover:text-purple-400 text-xs sm:text-sm"
                     >
                       Clear all
                     </button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {recentSearches.map((item) => (
                       <motion.div
                         key={item.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="bg-gray-800 rounded-lg p-3 flex items-center justify-between hover:bg-gray-750 transition-colors duration-300"
+                        className="bg-gray-800 rounded-lg p-2.5 sm:p-3 flex items-center justify-between hover:bg-gray-750 transition-colors duration-300"
                       >
                         <div className="flex items-center">
-                          <div className="w-10 h-10 rounded-full bg-purple-900/50 flex items-center justify-center mr-3">
-                            <FiUser className="text-purple-400" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-900/50 flex items-center justify-center mr-2 sm:mr-3">
+                            <FiUser className="text-purple-400 text-sm sm:text-base" />
                           </div>
                           <div>
-                            <h3 className="font-medium">{item.name}</h3>
-                            <p className="text-gray-400 text-sm">@{item.username}</p>
+                            <h3 className="font-medium text-sm sm:text-base">{item.name}</h3>
+                            <p className="text-gray-400 text-xs sm:text-sm">@{item.username}</p>
                           </div>
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <button
                             onClick={() => setSearchQuery(item.username)}
                             className="text-purple-400 hover:text-purple-300 p-1"
                           >
-                            <FiSearch size={18} />
+                            <FiSearch size={16} />
                           </button>
                           <button
                             onClick={() => removeRecentSearch(item.id)}
                             className="text-gray-400 hover:text-gray-300 p-1"
                           >
-                            <FiX size={18} />
+                            <FiX size={16} />
                           </button>
                         </div>
                       </motion.div>
@@ -240,24 +240,24 @@ const Search = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <h2 className="text-xl font-semibold mb-4 text-purple-300">Suggested for You</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-purple-300">Suggested for You</h2>
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
                   {suggestedUsers.map((user) => (
                     <motion.div
                       key={user.id}
-                      whileHover={{ y: -5 }}
-                      className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-purple-500 transition-all duration-300"
+                      whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(124, 58, 237, 0.15)" }}
+                      className="bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700 hover:border-purple-500 transition-all duration-300"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 p-0.5 mr-3">
+                          <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 p-0.5 mr-3">
                             <div className="w-full h-full rounded-full bg-gray-800 overflow-hidden">
                               <FiUser className="w-full h-full p-2 text-purple-300" />
                             </div>
                           </div>
                           <div>
-                            <h3 className="font-medium">{user.name}</h3>
-                            <p className="text-gray-400 text-sm">@{user.username}</p>
+                            <h3 className="font-medium text-sm sm:text-base">{user.name}</h3>
+                            <p className="text-gray-400 text-xs sm:text-sm">@{user.username}</p>
                           </div>
                         </div>
                         <motion.button
@@ -269,7 +269,7 @@ const Search = () => {
                           {user.isFollowing ? <FaHeart size={14} /> : <FiPlus size={14} />}
                         </motion.button>
                       </div>
-                      <div className="mt-3 flex justify-between text-sm">
+                      <div className="mt-2 sm:mt-3 flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-400">{Math.floor(Math.random() * 1000)} followers</span>
                         <span className="text-purple-400">{Math.floor(Math.random() * 100)} mutuals</span>
                       </div>

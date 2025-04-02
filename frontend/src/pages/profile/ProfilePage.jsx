@@ -19,423 +19,361 @@ import useFollow from "../../hooks/useFollow";
 import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
 
 const ProfilePage = () => {
-	const [coverImg, setCoverImg] = useState(null);
-	const [profileImg, setProfileImg] = useState(null);
-	const [feedType, setFeedType] = useState("posts");
-	const [showProfileHint, setShowProfileHint] = useState(false);
+  const [coverImg, setCoverImg] = useState(null);
+  const [profileImg, setProfileImg] = useState(null);
+  const [feedType, setFeedType] = useState("posts");
+  const [showProfileHint, setShowProfileHint] = useState(false);
 
-	const coverImgRef = useRef(null);
-	const profileImgRef = useRef(null);
+  const coverImgRef = useRef(null);
+  const profileImgRef = useRef(null);
 
-	const { username } = useParams();
+  const { username } = useParams();
 
-	const { follow, isPending } = useFollow();
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { follow, isPending } = useFollow();
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
-	const {
-		data: user,
-		isLoading,
-		refetch,
-		isRefetching,
-	} = useQuery({
-		queryKey: ["userProfile"],
-		queryFn: async () => {
-			try {
-				const res = await fetch(`/api/users/profile/${username}`);
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-				return data;
-			} catch (error) {
-				throw new Error(error);
-			}
-		},
-	});
+  const {
+    data: user,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["userProfile"],
+    queryFn: async () => {
+      try {
+        const res = await fetch(`/api/users/profile/${username}`);
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+  });
 
-	const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
+  const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
 
-	const isMyProfile = authUser?._id === user?._id;
-	const memberSinceDate = formatMemberSinceDate(user?.createdAt);
-	const amIFollowing = authUser?.following?.includes(user?._id);
+  const isMyProfile = authUser?._id === user?._id;
+  const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+  const amIFollowing = authUser?.following?.includes(user?._id);
 
-	const handleImgChange = (e, state) => {
-		const file = e.target.files[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				state === "coverImg" && setCoverImg(reader.result);
-				state === "profileImg" && setProfileImg(reader.result);
-			};
-			reader.readAsDataURL(file);
-		}
-	};
+  const handleImgChange = (e, state) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        state === "coverImg" && setCoverImg(reader.result);
+        state === "profileImg" && setProfileImg(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-	useEffect(() => {
-		refetch();
-	}, [username, refetch]);
+  useEffect(() => {
+    refetch();
+  }, [username, refetch]);
 
-	return (
-		<>
-			<div className='flex-[4_4_0] border-r border-gray-800 min-h-screen bg-black'>
-				{/* HEADER */}
-				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
-				{!isLoading && !isRefetching && !user && (
-					<motion.p 
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5 }}
-						className='text-center text-lg mt-4 text-purple-400'
-					>
-						User not found
-					</motion.p>
-				)}
-				<div className='flex flex-col'>
-					{!isLoading && !isRefetching && user && (
-						<>
-							<motion.div 
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								transition={{ duration: 0.3 }}
-								className='flex gap-10 px-4 py-2 items-center'
-							>
-								<Link to='/'>
-									<motion.div 
-										whileHover={{ scale: 1.1, color: "#a855f7" }} 
-										whileTap={{ scale: 0.9 }}
-										transition={{ type: "spring", stiffness: 400, damping: 10 }}
-										className="p-2 rounded-full hover:bg-purple-900/30"
-									>
-										<FaArrowLeft className='w-4 h-4 text-purple-400' />
-									</motion.div>
-								</Link>
-								<div className='flex flex-col'>
-									<motion.p 
-										initial={{ x: -20, opacity: 0 }}
-										animate={{ x: 0, opacity: 1 }}
-										transition={{ delay: 0.1 }}
-										className='font-bold text-lg text-white'
-									>
-										{user?.fullName}
-									</motion.p>
-									<motion.span 
-										initial={{ x: -20, opacity: 0 }}
-										animate={{ x: 0, opacity: 1 }}
-										transition={{ delay: 0.2 }}
-										className='text-sm text-purple-300/70'
-									>
-										{POSTS?.length} posts
-									</motion.span>
-								</div>
-							</motion.div>
-							{/* COVER IMG */}
-							<motion.div 
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.4 }}
-								className='relative group/cover'
-							>
-								<img
-									src={coverImg || user?.coverImg || "/cover.png"}
-									className='h-52 w-full object-cover shadow-lg rounded-b-lg'
-									alt='cover image'
-								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-b-lg"></div>
-								{isMyProfile && (
-										<motion.div
-										initial={{ opacity: 1 }}
-										animate={{
-										scale: [1, 1.1, 1],
-										boxShadow: [
-											"0px 0px 0px rgba(168, 85, 247, 0)",
-											"0px 0px 8px rgba(168, 85, 247, 0.5)",
-											"0px 0px 0px rgba(168, 85, 247, 0)",
-										],
-										}}
-										transition={{
-										duration: 2,
-										repeat: Infinity,
-										repeatType: "reverse",
-										}}
-										whileHover={{
-										scale: 1.2,
-										backgroundColor: "rgba(168, 85, 247, 0.8)",
-										boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)",
-										}}
-										className="absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full bg-gray-900/80 cursor-pointer transition duration-200 border border-purple-500"
-										onClick={() => coverImgRef.current.click()}
-									>
-										<MdEdit className="w-5 h-5 text-purple-300" />
-									</motion.div>
-					)}
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
 
-								<input
-									type='file'
-									hidden
-									accept='image/*'
-									ref={coverImgRef}
-									onChange={(e) => handleImgChange(e, "coverImg")}
-								/>
-								<input
-									type='file'
-									hidden
-									accept='image/*'
-									ref={profileImgRef}
-									onChange={(e) => handleImgChange(e, "profileImg")}
-								/>
-								{/* USER AVATAR */}
-								<motion.div 
-									initial={{ y: 20, opacity: 0 }}
-									animate={{ y: 0, opacity: 1 }}
-									transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-									className='avatar absolute -bottom-16 left-4'
-									onMouseEnter={() => isMyProfile && setShowProfileHint(true)}
-									onMouseLeave={() => setShowProfileHint(false)}
-								>
-									<div className='w-32 h-32 rounded-full relative group/avatar shadow-lg border-4 border-purple-600/90 hover:border-purple-500 transition-all duration-300'>
-										<motion.img 
-											src={profileImg || user?.profileImg || "/avatar-placeholder.png"} 
-											className="group-hover/avatar:brightness-110 transition-all duration-300 w-full h-full object-cover rounded-full"
-											whileHover={{ scale: 1.05 }}
-										/>
-										<AnimatePresence>
-											{showProfileHint && isMyProfile && (
-												<motion.div
-													initial={{ opacity: 0, scale: 0.8, y: 10 }}
-													animate={{ opacity: 1, scale: 1, y: 0 }}
-													exit={{ opacity: 0, scale: 0.8, y: 10 }}
-													className="absolute -top-10 left-0 bg-purple-900 text-white text-xs rounded px-2 py-1 shadow-lg border border-purple-700"
-												>
-													Click to change profile picture
-												</motion.div>
-											)}
-										</AnimatePresence>
-										{isMyProfile && (
-											<motion.div 
-											initial={{ opacity: 1 }}
-											animate={{ 
-											scale: [1, 1.1, 1],
-											boxShadow: ["0px 0px 0px rgba(168, 85, 247, 0)", "0px 0px 8px rgba(168, 85, 247, 0.5)", "0px 0px 0px rgba(168, 85, 247, 0)"]
-											}}
-											transition={{ 
-											duration: 2, 
-											repeat: Infinity, 
-											repeatType: "reverse",
-											delay: 1 
-											}}
-											whileHover={{ 
-											scale: 1.2, 
-											backgroundColor: "rgba(168, 85, 247, 0.8)",
-											boxShadow: "0px 0px 12px rgba(168, 85, 247, 0.8)"
-											}}
-											className='absolute top-5 right-3 p-1 bg-purple-600 rounded-full cursor-pointer border border-white/90 flex items-center justify-center'
-											style={{ width: "24px", height: "24px" }}
-											onClick={() => profileImgRef.current.click()}
-										>
-											<MdEdit className='w-4 h-4 text-white' />
-										</motion.div>
-										)}
-									</div>
-								</motion.div>
-							</motion.div>
-							<motion.div 
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								transition={{ delay: 0.4 }}
-								className='flex justify-end px-4 mt-5'
-							>
-								{isMyProfile && <EditProfileModal authUser={authUser} />}
-								{!isMyProfile && (
-									<motion.button
-										whileHover={{ scale: 1.05, backgroundColor: "#7e22ce", color: "white", borderColor: "#7e22ce" }}
-										whileTap={{ scale: 0.95 }}
-										className='btn btn-outline rounded-full btn-sm border-purple-600 text-purple-400 hover:bg-purple-600 hover:border-purple-600'
-										onClick={() => follow(user?._id)}
-									>
-										{isPending && (
-											<span className="loading loading-spinner loading-xs text-purple-400"></span>
-										)}
-										{!isPending && amIFollowing && "Unfollow"}
-										{!isPending && !amIFollowing && "Follow"}
-									</motion.button>
-								)}
-								{(coverImg || profileImg) && (
-									<motion.button
-										whileHover={{ scale: 1.05, backgroundColor: "#7e22ce" }}
-										whileTap={{ scale: 0.95 }}
-										animate={{ 
-											boxShadow: ["0px 0px 0px rgba(147, 51, 234, 0)", "0px 0px 10px rgba(147, 51, 234, 0.5)", "0px 0px 0px rgba(147, 51, 234, 0)"] 
-										}}
-										transition={{ 
-											duration: 2, 
-											repeat: Infinity 
-										}}
-										className='btn bg-purple-700 hover:bg-purple-800 rounded-full btn-sm text-white px-4 ml-2 border-none'
-										onClick={async () => {
-											await updateProfile({ coverImg, profileImg });
-											setProfileImg(null);
-											setCoverImg(null);
-										}}
-									>
-										{isUpdatingProfile ? (
-											<span className="flex items-center gap-1">
-												<span className="loading loading-spinner loading-xs"></span>
-												Updating...
-											</span>
-										) : "Update"}
-									</motion.button>
-								)}
-							</motion.div>
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
-							<motion.div 
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: 0.5 }}
-								className='flex flex-col gap-4 mt-14 px-4'
-							>
-								<motion.div 
-									className='flex flex-col'
-									whileInView={{ 
-										transition: { staggerChildren: 0.1 } 
-									}}
-								>
-									<motion.span 
-										initial={{ opacity: 0, x: -10 }}
-										animate={{ opacity: 1, x: 0 }}
-										transition={{ delay: 0.6 }}
-										className='font-bold text-xl bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent'
-									>
-										{user?.fullName}
-									</motion.span>
-									<motion.span 
-										initial={{ opacity: 0, x: -10 }}
-										animate={{ opacity: 1, x: 0 }}
-										transition={{ delay: 0.7 }}
-										className='text-sm text-purple-300/80'
-									>
-										@{user?.username}
-									</motion.span>
-									<motion.span 
-										initial={{ opacity: 0, x: -10 }}
-										animate={{ opacity: 1, x: 0 }}
-										transition={{ delay: 0.8 }}
-										className='text-sm my-1 text-white/90'
-									>
-										{user?.bio}
-									</motion.span>
-								</motion.div>
+  return (
+    <motion.div 
+      className='flex-[4_4_0] border-r border-gray-800 min-h-screen bg-gradient-to-b from-black to-gray-900 overflow-x-hidden'
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* HEADER */}
+      {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+      {!isLoading && !isRefetching && !user && (
+        <motion.p 
+          variants={itemVariants}
+          className='text-center text-lg mt-4 text-purple-400'
+        >
+          User not found
+        </motion.p>
+      )}
+      
+      {!isLoading && !isRefetching && user && (
+        <>
+          {/* TOP NAVIGATION */}
+          <motion.div 
+            variants={itemVariants}
+            className='flex items-center gap-4 px-4 py-3 bg-black/50 backdrop-blur-md sticky top-0 z-10'
+          >
+            <Link to='/'>
+              <motion.div 
+                whileHover={{ scale: 1.2, rotate: 360 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-full bg-purple-900/20"
+              >
+                <FaArrowLeft className='w-5 h-5 text-purple-400' />
+              </motion.div>
+            </Link>
+            <div className='flex flex-col'>
+              <motion.span 
+                className='font-bold text-lg sm:text-xl text-white truncate max-w-[150px] sm:max-w-none'
+                whileHover={{ color: "#a855f7" }}
+              >
+                {user?.fullName}
+              </motion.span>
+              <span className='text-xs sm:text-sm text-purple-300/70'>
+                {POSTS?.length} posts
+              </span>
+            </div>
+          </motion.div>
 
-								<div className='flex gap-2 flex-wrap'>
-									{user?.link && (
-										<motion.div 
-											initial={{ opacity: 0, y: 10 }}
-											animate={{ opacity: 1, y: 0 }}
-											transition={{ delay: 0.9 }}
-											whileHover={{ scale: 1.05, y: -2 }}
-											className='flex gap-1 items-center'
-										>
-											<>
-												<FaLink className='w-3 h-3 text-purple-400' />
-												<a
-													href={user?.link}
-													target='_blank'
-													rel='noreferrer'
-													className='text-sm text-purple-400 hover:text-purple-300 hover:underline transition-colors'
-												>
-													{user?.link}
-												</a>
-											</>
-										</motion.div>
-									)}
-									<motion.div 
-										initial={{ opacity: 0, y: 10 }}
-										animate={{ opacity: 1, y: 0 }}
-										transition={{ delay: 1 }}
-										whileHover={{ scale: 1.05 }}
-										className='flex gap-2 items-center bg-black/30 px-2 py-1 rounded-lg'
-									>
-										<IoCalendarOutline className='w-4 h-4 text-purple-400' />
-										<span className='text-sm text-purple-300/80'>{memberSinceDate}</span>
-									</motion.div>
-								</div>
-								<div className='flex gap-4'>
-									<motion.div 
-										initial={{ opacity: 0, scale: 0.9 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{ delay: 1.1 }}
-										whileHover={{ scale: 1.05, backgroundColor: "rgba(126, 34, 206, 0.3)" }}
-										className='flex gap-1 items-center bg-purple-900/20 px-3 py-1 rounded-full border border-purple-800/50'
-									>
-										<span className='font-bold text-xs text-purple-300'>{user?.following?.length || 0}</span>
-										<span className='text-purple-300/70 text-xs'>Following</span>
-									</motion.div>
-									<motion.div 
-										initial={{ opacity: 0, scale: 0.9 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{ delay: 1.2 }}
-										whileHover={{ scale: 1.05, backgroundColor: "rgba(126, 34, 206, 0.3)" }}
-										className='flex gap-1 items-center bg-purple-900/20 px-3 py-1 rounded-full border border-purple-800/50'
-									>
-										<span className='font-bold text-xs text-purple-300'>{user?.followers?.length || 0}</span>
-										<span className='text-purple-300/70 text-xs'>Followers</span>
-									</motion.div>
-								</div>
-							</motion.div>
-							<div className='flex w-full border-b border-purple-900/40 mt-4'>
-								<motion.div
-									whileHover={{ backgroundColor: "rgba(126, 34, 206, 0.2)" }}
-									className={`flex justify-center flex-1 p-3 transition duration-300 relative cursor-pointer ${
-										feedType === "posts" ? "text-purple-400" : "text-purple-300/70"
-									}`}
-									onClick={() => setFeedType("posts")}
-								>
-									<motion.span
-										whileHover={{ scale: 1.05 }}
-									>
-										Posts
-									</motion.span>
-									<AnimatePresence>
-										{feedType === "posts" && (
-											<motion.div 
-												initial={{ width: 0 }}
-												animate={{ width: "40px" }}
-												exit={{ width: 0 }}
-												className='absolute bottom-0 h-1 rounded-full bg-purple-500' 
-											/>
-										)}
-									</AnimatePresence>
-								</motion.div>
-								<motion.div
-									whileHover={{ backgroundColor: "rgba(126, 34, 206, 0.2)" }}
-									className={`flex justify-center flex-1 p-3 transition duration-300 relative cursor-pointer ${
-										feedType === "likes" ? "text-purple-400" : "text-purple-300/70"
-									}`}
-									onClick={() => setFeedType("likes")}
-								>
-									<motion.span
-										whileHover={{ scale: 1.05 }}
-									>
-										Likes
-									</motion.span>
-									<AnimatePresence>
-										{feedType === "likes" && (
-											<motion.div 
-												initial={{ width: 0 }}
-												animate={{ width: "40px" }}
-												exit={{ width: 0 }}
-												className='absolute bottom-0 h-1 rounded-full bg-purple-500' 
-											/>
-										)}
-									</AnimatePresence>
-								</motion.div>
-							</div>
-						</>
-					)}
+          {/* COVER IMAGE */}
+          <motion.div 
+            variants={itemVariants}
+            className='relative group/cover'
+          >
+            <img
+              src={coverImg || user?.coverImg || "/cover.png"}
+              className='h-40 sm:h-56 w-full object-cover shadow-2xl'
+              alt='cover image'
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            {isMyProfile && (
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 sm:p-2 bg-purple-600/80 rounded-full cursor-pointer border border-purple-400"
+                onClick={() => coverImgRef.current.click()}
+              >
+                <MdEdit className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+              </motion.div>
+            )}
+          </motion.div>
 
-					<Posts feedType={feedType} username={username} userId={user?._id} />
-				</div>
-			</div>
-		</>
-	);
+          {/* PROFILE CONTENT */}
+          <motion.div 
+            variants={itemVariants}
+            className='px-4 pt-3 relative'
+          >
+            {/* PROFILE AVATAR */}
+            <motion.div 
+              className='absolute -top-16 sm:-top-20 left-2 sm:left-4'
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            >
+              <div className='relative w-24 h-24 sm:w-36 sm:h-36'>
+                <motion.div 
+                  className='w-full h-full rounded-full border-2 sm:border-4 border-purple-600 bg-gray-900 overflow-hidden shadow-xl'
+                  whileHover={{ borderColor: "#a855f7" }}
+                  onMouseEnter={() => isMyProfile && setShowProfileHint(true)}
+                  onMouseLeave={() => setShowProfileHint(false)}
+                >
+                  <img 
+                    src={profileImg || user?.profileImg || "/avatar-placeholder.png"}
+                    className='w-full h-full object-cover'
+                    alt='profile'
+                  />
+                </motion.div>
+                
+                {isMyProfile && (
+                  <motion.div
+                    whileHover={{ scale: 1.2 }}
+                    className='absolute bottom-1 right-1 sm:bottom-2 sm:right-2 p-1 sm:p-2 bg-purple-600 rounded-full cursor-pointer'
+                    onClick={() => profileImgRef.current.click()}
+                  >
+                    <MdEdit className='w-3 h-3 sm:w-5 sm:h-5 text-white' />
+                  </motion.div>
+                )}
+
+                <AnimatePresence>
+                  {showProfileHint && isMyProfile && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute -top-8 sm:-top-12 left-0 bg-purple-900/90 text-white text-xs rounded-lg px-2 py-1 sm:px-3 sm:py-2 shadow-lg"
+                    >
+                      Change Profile Picture
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+
+            {/* ACTION BUTTONS */}
+            <motion.div 
+              className='flex justify-end pt-2 sm:pt-4 gap-2'
+              variants={itemVariants}
+            >
+              {isMyProfile && <EditProfileModal authUser={authUser} />}
+              {!isMyProfile && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 py-1 sm:px-6 sm:py-2 rounded-full font-semibold text-sm sm:text-base text-white ${
+                    amIFollowing 
+                      ? 'bg-purple-600/20 border border-purple-600' 
+                      : 'bg-purple-600'
+                  }`}
+                  onClick={() => follow(user?._id)}
+                >
+                  {isPending ? (
+                    <span className="loading loading-spinner loading-xs sm:loading-sm"></span>
+                  ) : amIFollowing ? "Unfollow" : "Follow"}
+                </motion.button>
+              )}
+              {(coverImg || profileImg) && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className='px-4 py-1 sm:px-6 sm:py-2 bg-purple-700 rounded-full text-sm sm:text-base text-white font-semibold'
+                  onClick={async () => {
+                    await updateProfile({ coverImg, profileImg });
+                    setProfileImg(null);
+                    setCoverImg(null);
+                  }}
+                >
+                  {isUpdatingProfile ? (
+                    <span className="flex items-center gap-1 sm:gap-2">
+                      <span className="loading loading-spinner loading-xs sm:loading-sm"></span>
+                      <span className="hidden sm:inline">Updating</span>
+                    </span>
+                  ) : "Update"}
+                </motion.button>
+              )}
+            </motion.div>
+
+            {/* USER INFO */}
+            <motion.div 
+              className='mt-16 sm:mt-24 flex flex-col gap-2 sm:gap-4'
+              variants={itemVariants}
+            >
+              <div className='flex flex-col'>
+                <motion.span 
+                  className='font-bold text-xl sm:text-2xl text-white'
+                  whileHover={{ color: "#a855f7" }}
+                >
+                  {user?.fullName}
+                </motion.span>
+                <span className='text-gray-400 text-sm sm:text-base'>@{user?.username}</span>
+                {user?.bio && (
+                  <motion.p 
+                    className='text-white mt-1 sm:mt-2 text-sm sm:text-base'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    {user?.bio}
+                  </motion.p>
+                )}
+              </div>
+
+              <motion.div 
+                className='flex gap-2 sm:gap-4 flex-wrap text-sm sm:text-base'
+                variants={itemVariants}
+              >
+                {user?.link && (
+                  <motion.a
+                    href={user?.link}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center gap-1 sm:gap-2 text-purple-400 hover:text-purple-300 truncate max-w-[180px] sm:max-w-none'
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <FaLink className='w-3 h-3 sm:w-4 sm:h-4' />
+                    <span className="truncate">{user?.link.replace(/^https?:\/\//, '')}</span>
+                  </motion.a>
+                )}
+                <motion.div 
+                  className='flex items-center gap-1 sm:gap-2 text-purple-300'
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <IoCalendarOutline className='w-4 h-4 sm:w-5 sm:h-5' />
+                  <span>{memberSinceDate}</span>
+                </motion.div>
+              </motion.div>
+
+              <motion.div 
+                className='flex gap-4 sm:gap-6 text-sm sm:text-base'
+                variants={itemVariants}
+              >
+                <motion.div 
+                  className='flex items-center gap-1 sm:gap-2'
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span className='font-bold text-white'>{user?.following?.length || 0}</span>
+                  <span className='text-gray-400'>Following</span>
+                </motion.div>
+                <motion.div 
+                  className='flex items-center gap-1 sm:gap-2'
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span className='font-bold text-white'>{user?.followers?.length || 0}</span>
+                  <span className='text-gray-400'>Followers</span>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* FEED TABS */}
+            <motion.div 
+              className='flex w-full border-b border-gray-800 mt-4 sm:mt-6'
+              variants={itemVariants}
+            >
+              {["posts", "likes"].map((type) => (
+                <motion.div
+                  key={type}
+                  className={`flex-1 text-center p-2 sm:p-4 cursor-pointer relative ${
+                    feedType === type ? 'text-white' : 'text-gray-400'
+                  }`}
+                  onClick={() => setFeedType(type)}
+                  whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                >
+                  <span className='capitalize font-semibold text-sm sm:text-base'>{type}</span>
+                  {feedType === type && (
+                    <motion.div
+                      className='absolute bottom-0 left-1/2 w-12 sm:w-16 h-0.5 sm:h-1 bg-purple-600 rounded-full'
+                      layoutId="underline"
+                      initial={{ x: "-50%" }}
+                    />
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* HIDDEN INPUTS */}
+          <input
+            type='file'
+            hidden
+            accept='image/*'
+            ref={coverImgRef}
+            onChange={(e) => handleImgChange(e, "coverImg")}
+          />
+          <input
+            type='file'
+            hidden
+            accept='image/*'
+            ref={profileImgRef}
+            onChange={(e) => handleImgChange(e, "profileImg")}
+          />
+        </>
+      )}
+
+      <Posts feedType={feedType} username={username} userId={user?._id} />
+    </motion.div>
+  );
 };
+
 export default ProfilePage;
