@@ -14,7 +14,14 @@ const Messages = () => {
   const queryClient = useQueryClient();
 
   // Fetch authenticated user
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { data: authUser } = useQuery({ 
+    queryKey: ["authUser"],
+    // Adding queryFn to fix missing requirement
+    queryFn: async () => {
+      const { data } = await axios.get("/api/user");
+      return data;
+    }
+  });
 
   // Fetch chat list
   const { 
@@ -69,7 +76,9 @@ const Messages = () => {
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }, 100); // Small delay to ensure all content is rendered
     }
   };
 
@@ -92,42 +101,64 @@ const Messages = () => {
     chat.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Animation variants
+  // Enhanced animation variants
   const chatVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
   };
 
   const messageVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+    hidden: { opacity: 0, scale: 0.9, y: 10 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0, 
+      transition: { duration: 0.3, type: "spring", stiffness: 500 } 
+    },
+  };
+
+  const sidebarAnimation = {
+    hover: { scale: 1.02, transition: { duration: 0.2 } },
+  };
+
+  const buttonAnimation = {
+    hover: { scale: 1.1, transition: { duration: 0.2 } },
+    tap: { scale: 0.95 }
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-900 text-white">
+    <div className="flex h-[calc(100vh-64px)] bg-black text-white">
       {/* Chat List Sidebar */}
-      <div className="w-full md:w-96 border-r border-gray-700 flex flex-col">
+      <div className="w-full md:w-96 border-r border-gray-800 flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-700 bg-gray-800">
-          <h2 className="text-xl font-bold">Messages</h2>
-          <div className="mt-3 flex items-center gap-2 bg-gray-700 rounded-full p-2">
-            <MdSearch className="w-5 h-5 text-gray-400" />
+        <div className="p-4 border-b border-gray-800 bg-black">
+          <h2 className="text-xl font-bold text-green-400">Messages</h2>
+          <motion.div 
+            className="mt-3 flex items-center gap-2 bg-gray-900 rounded-full p-2"
+            whileHover={{ scale: 1.01 }}
+          >
+            <MdSearch className="w-5 h-5 text-purple-300" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chats..."
-              className="w-full bg-transparent outline-none text-gray-300 placeholder-gray-500"
+              className="w-full bg-transparent outline-none text-white placeholder-gray-500"
             />
-          </div>
+          </motion.div>
         </div>
 
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto p-2">
           {chatListLoading ? (
             <div className="flex justify-center p-4">
-              <p className="text-gray-400">Loading chats...</p>
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <p className="text-purple-300">Loading chats...</p>
+              </motion.div>
             </div>
           ) : chatListError ? (
             <div className="flex justify-center p-4">
@@ -144,17 +175,18 @@ const Messages = () => {
               <motion.div
                 key={chat.id}
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                  selectedChat?.id === chat.id ? "bg-gray-700" : "hover:bg-gray-800"
+                  selectedChat?.id === chat.id ? "bg-gray-800 border border-green-500" : "hover:bg-gray-900"
                 }`}
                 onClick={() => setSelectedChat(chat)}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 500 }}
+                variants={sidebarAnimation}
+                whileHover="hover"
+                transition={{ type: "spring", stiffness: 400 }}
               >
-                <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center overflow-hidden">
                   {chat.avatar ? (
                     <img src={chat.avatar} alt={chat.username} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-lg font-bold uppercase">
+                    <span className="text-lg font-bold uppercase text-white">
                       {chat.username[0]}
                     </span>
                   )}
@@ -166,9 +198,13 @@ const Messages = () => {
                   </p>
                 </div>
                 {chat.unread > 0 && (
-                  <span className="bg-blue-500 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <motion.span 
+                    className="bg-green-500 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
                     {chat.unread}
-                  </span>
+                  </motion.span>
                 )}
               </motion.div>
             ))
@@ -177,10 +213,11 @@ const Messages = () => {
       </div>
 
       {/* Chat Window */}
-      <div className="flex-1 flex flex-col bg-gray-800">
-        <AnimatePresence>
+      <div className="flex-1 flex flex-col bg-gray-900">
+        <AnimatePresence mode="wait">
           {selectedChat ? (
             <motion.div
+              key={selectedChat.id}
               variants={chatVariants}
               initial="hidden"
               animate="visible"
@@ -188,11 +225,13 @@ const Messages = () => {
               className="flex-1 flex flex-col"
             >
               {/* Chat Header */}
-              <div className="p-4 border-b border-gray-700 bg-gray-800 flex items-center justify-between">
+              <div className="p-4 border-b border-gray-800 bg-black flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center cursor-pointer"
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-purple-900 flex items-center justify-center cursor-pointer"
                     onClick={() => setSelectedChat(null)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {selectedChat.avatar ? (
                       <img 
@@ -201,28 +240,34 @@ const Messages = () => {
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <span className="font-bold uppercase">
+                      <span className="font-bold uppercase text-white">
                         {selectedChat.username[0]}
                       </span>
                     )}
-                  </div>
-                  <span className="font-semibold">{selectedChat.username}</span>
+                  </motion.div>
+                  <span className="font-semibold text-green-400">{selectedChat.username}</span>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    className="p-2 rounded-full hover:bg-gray-700"
+                  <motion.button
+                    className="p-2 rounded-full hover:bg-gray-800 text-purple-400"
                     onClick={startVideoCall}
                     aria-label="Start video call"
+                    variants={buttonAnimation}
+                    whileHover="hover"
+                    whileTap="tap"
                   >
                     <IoVideocam className="w-5 h-5" />
-                  </button>
-                  <button
-                    className="p-2 rounded-full hover:bg-gray-700"
+                  </motion.button>
+                  <motion.button
+                    className="p-2 rounded-full hover:bg-gray-800 text-purple-400"
                     onClick={startVoiceCall}
                     aria-label="Start voice call"
+                    variants={buttonAnimation}
+                    whileHover="hover"
+                    whileTap="tap"
                   >
                     <IoCall className="w-5 h-5" />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -232,16 +277,21 @@ const Messages = () => {
                 className="flex-1 overflow-y-auto p-4 space-y-3"
               >
                 {messages.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-gray-400">
+                  <motion.div 
+                    className="flex items-center justify-center h-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <p className="text-purple-300">
                       Start a conversation with {selectedChat.username}
                     </p>
-                  </div>
+                  </motion.div>
                 ) : (
                   <AnimatePresence>
-                    {messages.map((msg) => (
+                    {messages.map((msg, index) => (
                       <motion.div
-                        key={msg.id || msg.timestamp}
+                        key={msg.id || `${msg.timestamp}-${index}`}
                         variants={messageVariants}
                         initial="hidden"
                         animate="visible"
@@ -252,8 +302,8 @@ const Messages = () => {
                         <div
                           className={`max-w-[80%] p-3 rounded-lg ${
                             msg.senderId === authUser?.id
-                              ? "bg-blue-600"
-                              : "bg-gray-700"
+                              ? "bg-green-600"
+                              : "bg-purple-900"
                           }`}
                         >
                           <p className="text-sm">{msg.text}</p>
@@ -273,43 +323,61 @@ const Messages = () => {
               {/* Message Input */}
               <form 
                 onSubmit={handleSendMessage}
-                className="p-4 border-t border-gray-700"
+                className="p-4 border-t border-gray-800"
               >
                 <div className="flex items-center gap-2">
-                  <input
+                  <motion.input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="flex-1 p-3 rounded-full bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 p-3 rounded-full bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
                     aria-label="Type your message"
+                    whileFocus={{ scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 300 }}
                   />
-                  <button
+                  <motion.button
                     type="submit"
-                    className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors"
+                    className={`p-3 rounded-full ${
+                      newMessage.trim() ? "bg-green-600 hover:bg-green-700" : "bg-gray-700"
+                    } transition-colors`}
                     disabled={!newMessage.trim()}
                     aria-label="Send message"
+                    variants={buttonAnimation}
+                    whileHover={newMessage.trim() ? "hover" : {}}
+                    whileTap={newMessage.trim() ? "tap" : {}}
                   >
                     <MdSend className="w-5 h-5" />
-                  </button>
+                  </motion.button>
                 </div>
               </form>
             </motion.div>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center p-6"
-              >
-                <h3 className="text-xl font-semibold text-gray-400 mb-2">
+            <motion.div 
+              className="flex-1 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-center p-6">
+                <motion.h3 
+                  className="text-xl font-semibold text-green-400 mb-2"
+                  initial={{ y: -20 }}
+                  animate={{ y: 0 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   Select a chat
-                </h3>
-                <p className="text-gray-500">
+                </motion.h3>
+                <motion.p 
+                  className="text-purple-300"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
                   Choose an existing conversation or start a new one
-                </p>
-              </motion.div>
-            </div>
+                </motion.p>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
