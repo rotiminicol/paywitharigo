@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, } from "framer-motion";
 import Posts from "../../components/common/Posts";
 import CreatePost from "./CreatePost";
-import { FiTrendingUp, FiUsers, FiSearch, FiBell, FiMessageCircle } from "react-icons/fi";
 
 const HomePage = () => {
   const [feedType, setFeedType] = useState("forYou");
   const [scrolled, setScrolled] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const mainRef = useRef(null);
 
   useEffect(() => {
@@ -18,6 +16,7 @@ const HomePage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -57,9 +56,9 @@ const HomePage = () => {
       ref={mainRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-[3_3_0] border-r border-indigo-900/40 min-h-screen bg-gradient-to-br from-gray-950 via-indigo-950 to-black relative overflow-hidden"
+      className="flex-[3_3_0] border-r border-purple-900/40 min-h-screen bg-gradient-to-br from-black via-gray-950 to-black relative overflow-hidden"
     >
-      {/* Enhanced animated background with more dynamic elements */}
+      {/* Enhanced animated background with dynamic elements in new color scheme */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
           variants={parallaxBg}
@@ -67,9 +66,10 @@ const HomePage = () => {
           animate="show"
           className="absolute inset-0"
         >
+          {/* Green glowing orb */}
           <motion.div 
             variants={floatingItem}
-            className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-800/15 blur-3xl"
+            className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-600/20 blur-3xl"
             animate={{
               x: [0, 30, 0],
               y: [0, -40, 0],
@@ -82,9 +82,10 @@ const HomePage = () => {
               repeatType: "mirror"
             }}
           />
+          {/* Purple glowing orb */}
           <motion.div 
             variants={floatingItem}
-            className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-cyan-700/15 blur-3xl"
+            className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-purple-700/20 blur-3xl"
             animate={{
               x: [0, -30, 0],
               y: [0, 40, 0],
@@ -97,9 +98,10 @@ const HomePage = () => {
               repeatType: "mirror"
             }}
           />
+          {/* Smaller green orb */}
           <motion.div 
             variants={floatingItem}
-            className="absolute top-1/4 left-1/3 w-64 h-64 rounded-full bg-violet-600/15 blur-3xl"
+            className="absolute top-1/4 left-1/3 w-64 h-64 rounded-full bg-green-600/15 blur-3xl"
             animate={{
               x: [0, 50, 0],
               y: [0, 30, 0],
@@ -112,104 +114,144 @@ const HomePage = () => {
               repeatType: "mirror"
             }}
           />
+          {/* Additional purple accent */}
+          <motion.div 
+            variants={floatingItem}
+            className="absolute bottom-1/3 right-1/4 w-72 h-72 rounded-full bg-purple-800/15 blur-3xl"
+            animate={{
+              x: [0, -40, 0],
+              y: [0, -20, 0],
+              scale: [0.9, 1.1, 0.9],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 13,
+              repeat: Infinity,
+              repeatType: "mirror"
+            }}
+          />
+          {/* Green accent */}
+          <motion.div 
+            variants={floatingItem}
+            className="absolute top-1/2 right-1/3 w-56 h-56 rounded-full bg-emerald-700/15 blur-3xl"
+            animate={{
+              x: [0, 30, 0],
+              y: [0, 40, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{
+              duration: 14,
+              repeat: Infinity,
+              repeatType: "mirror"
+            }}
+          />
         </motion.div>
+        
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        
+        {/* Animated particles */}
+        <div className="absolute inset-0">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-white"
+              initial={{
+                x: Math.random() * 100 + "%",
+                y: Math.random() * 100 + "%",
+                opacity: Math.random() * 0.5 + 0.3,
+                scale: Math.random() * 0.5 + 0.5
+              }}
+              animate={{
+                y: [null, "-100%"],
+                opacity: [null, 0],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                delay: Math.random() * 5
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Enhanced header with premium glass effect */}
+      {/* Simplified header with just logo and name */}
       <motion.div 
         className={`sticky top-0 z-20 backdrop-blur-xl transition-all duration-300 ${
-          scrolled ? "bg-gray-950/80 shadow-xl shadow-indigo-900/30" : "bg-transparent"
+          scrolled ? "bg-black/80 shadow-xl shadow-purple-900/30" : "bg-transparent"
         }`}
         animate={{
-          borderColor: scrolled ? "rgba(99, 102, 241, 0.6)" : "rgba(99, 102, 241, 0.2)",
+          borderColor: scrolled ? "rgba(126, 34, 206, 0.6)" : "rgba(126, 34, 206, 0.2)",
         }}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-indigo-800/30">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-purple-800/30">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, type: "spring" }}
             className="flex items-center"
           >
-            <div className="w-9 h-9 mr-3 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <span className="text-white font-extrabold text-xl">I</span>
-            </div>
-            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-400 via-cyan-300 to-indigo-500 bg-clip-text text-transparent tracking-tight">
-              Ijuewa
-            </h1>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center space-x-3"
-          >
             <motion.div 
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-2 rounded-full hover:bg-indigo-500/20 transition-colors"
+              whileHover={{ 
+                scale: 1.1,
+                boxShadow: "0 0 15px rgba(52, 211, 153, 0.7)"
+              }}
+              className="w-10 h-10 mr-3 rounded-full bg-gradient-to-br from-green-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30"
             >
-              <FiSearch className="text-indigo-200 text-lg" />
-            </motion.div>
-            
-            <motion.div 
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2 rounded-full hover:bg-indigo-500/20 transition-colors"
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
-              <FiBell className="text-indigo-200 text-lg" />
               <motion.span 
-                className="absolute top-0 right-0 w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full"
-                animate={{ scale: [1, 1.2, 1] }}
+                className="text-white font-extrabold text-xl"
+                animate={{ 
+                  textShadow: ["0 0 5px rgba(255,255,255,0.3)", "0 0 15px rgba(255,255,255,0.7)", "0 0 5px rgba(255,255,255,0.3)"]
+                }}
                 transition={{ duration: 2, repeat: Infinity }}
-              />
+              >
+                I
+              </motion.span>
             </motion.div>
-            
-            <motion.div 
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-2 rounded-full hover:bg-indigo-500/20 transition-colors"
+            <motion.h1 
+              className="text-2xl font-extrabold bg-gradient-to-r from-green-400 via-white to-purple-500 bg-clip-text text-transparent tracking-tight"
+              whileHover={{ scale: 1.05 }}
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{ duration: 6, repeat: Infinity }}
             >
-              <FiMessageCircle className="text-indigo-200 text-lg" />
-            </motion.div>
-            
-            <motion.div 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-cyan-500 cursor-pointer overflow-hidden border-2 border-indigo-300/30 shadow-md"
-            >
-              <img 
-                src="/api/placeholder/100/100" 
-                alt="User avatar" 
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
+              Ijuewa
+            </motion.h1>
           </motion.div>
         </div>
 
-        {/* Enhanced feed type selector */}
-        <div className="flex w-full border-b border-indigo-800/20">
+        {/* Enhanced feed type selector with new color scheme */}
+        <div className="flex w-full border-b border-purple-800/20">
           <motion.div
             className="flex justify-center items-center gap-2 flex-1 py-4 px-3 cursor-pointer relative overflow-hidden"
             onClick={() => setFeedType("forYou")}
             whileHover={{ 
-              backgroundColor: "rgba(99, 102, 241, 0.2)"
+              backgroundColor: "rgba(126, 34, 206, 0.2)"
             }}
             whileTap={{ scale: 0.98 }}
           >
-            <FiTrendingUp className={`${feedType === "forYou" ? "text-indigo-400" : "text-gray-400"} transition-colors duration-300 text-lg`} />
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={`h-5 w-5 ${feedType === "forYou" ? "text-green-400" : "text-gray-400"} transition-colors duration-300`}
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
             <span className={`font-semibold text-lg ${
               feedType === "forYou" 
-                ? "text-indigo-300 bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent" 
+                ? "text-green-300 bg-gradient-to-r from-green-400 to-purple-400 bg-clip-text text-transparent" 
                 : "text-gray-300"
             } transition-all duration-300`}>
               For You
             </span>
             {feedType === "forYou" && (
               <motion.div 
-                className="absolute bottom-0 h-1 bg-gradient-to-r from-indigo-600 to-cyan-400 rounded-t-full"
+                className="absolute bottom-0 h-1 bg-gradient-to-r from-green-600 to-purple-500 rounded-t-full"
                 initial={{ width: 0 }}
                 animate={{ width: "70%" }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
@@ -221,21 +263,29 @@ const HomePage = () => {
             className="flex justify-center items-center gap-2 flex-1 py-4 px-3 cursor-pointer relative overflow-hidden"
             onClick={() => setFeedType("following")}
             whileHover={{ 
-              backgroundColor: "rgba(99, 102, 241, 0.2)"
+              backgroundColor: "rgba(126, 34, 206, 0.2)"
             }}
             whileTap={{ scale: 0.98 }}
           >
-            <FiUsers className={`${feedType === "following" ? "text-indigo-400" : "text-gray-400"} transition-colors duration-300 text-lg`} />
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={`h-5 w-5 ${feedType === "following" ? "text-green-400" : "text-gray-400"} transition-colors duration-300`}
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
             <span className={`font-semibold text-lg ${
               feedType === "following" 
-                ? "text-indigo-300 bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent" 
+                ? "text-green-300 bg-gradient-to-r from-green-400 to-purple-400 bg-clip-text text-transparent" 
                 : "text-gray-300"
             } transition-all duration-300`}>
               Following
             </span>
             {feedType === "following" && (
               <motion.div 
-                className="absolute bottom-0 h-1 bg-gradient-to-r from-indigo-600 to-cyan-400 rounded-t-full"
+                className="absolute bottom-0 h-1 bg-gradient-to-r from-green-600 to-purple-500 rounded-t-full"
                 initial={{ width: 0 }}
                 animate={{ width: "70%" }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
@@ -244,55 +294,6 @@ const HomePage = () => {
           </motion.div>
         </div>
       </motion.div>
-
-      {/* Enhanced notifications dropdown */}
-      <AnimatePresence>
-        {showNotifications && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="absolute right-4 top-20 z-30 w-72 bg-gray-900/98 backdrop-blur-xl rounded-xl border border-indigo-800/50 shadow-2xl shadow-indigo-900/40 overflow-hidden"
-          >
-            <div className="p-3 border-b border-indigo-800/40 bg-gradient-to-r from-indigo-900/20 to-gray-900">
-              <h3 className="text-indigo-200 font-semibold text-lg">Notifications</h3>
-            </div>
-            <div className="max-h-80 overflow-y-auto">
-              {[1, 2, 3, 4].map((item) => (
-                <motion.div 
-                  key={item}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: item * 0.1 }}
-                  className="p-3 border-b border-indigo-800/20 hover:bg-indigo-800/15 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-cyan-500 flex-shrink-0 overflow-hidden shadow-md">
-                      <img src={`/api/placeholder/${40 + item}/${40 + item}`} alt="User" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-200 leading-tight">
-                        <span className="font-semibold text-indigo-300">User{item}</span> 
-                        {item === 1 ? ' liked your post' : 
-                         item === 2 ? ' commented on your post' : 
-                         item === 3 ? ' followed you' : 
-                         ' shared your content'}
-                      </p>
-                      <span className="text-xs text-gray-400">{item} min ago</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <motion.div 
-              className="p-3 text-center text-sm text-indigo-400 hover:text-indigo-300 cursor-pointer bg-gradient-to-t from-indigo-900/10 to-transparent"
-              whileHover={{ backgroundColor: "rgba(99, 102, 241, 0.15)" }}
-            >
-              View all notifications
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Content container with enhanced animations */}
       <motion.div
@@ -333,11 +334,11 @@ const HomePage = () => {
         <motion.button
           whileHover={{ 
             scale: 1.15, 
-            boxShadow: "0 0 30px rgba(99, 102, 241, 0.6)",
-            rotate: 90
+            boxShadow: "0 0 30px rgba(139, 92, 246, 0.6)",
+            rotate: 180
           }}
           whileTap={{ scale: 0.95 }}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-500 flex items-center justify-center shadow-xl shadow-indigo-600/40 border border-indigo-400/30"
+          className="w-14 h-14 rounded-full bg-gradient-to-r from-green-600 to-purple-600 flex items-center justify-center shadow-xl shadow-purple-600/40 border border-green-400/30"
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -350,6 +351,10 @@ const HomePage = () => {
           </svg>
         </motion.button>
       </motion.div>
+      
+      {/* Decorative side accents */}
+      <div className="absolute left-0 top-1/3 h-32 w-1 bg-gradient-to-b from-transparent via-green-500 to-transparent opacity-70"></div>
+      <div className="absolute right-0 top-2/3 h-32 w-1 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
     </motion.div>
   );
 };

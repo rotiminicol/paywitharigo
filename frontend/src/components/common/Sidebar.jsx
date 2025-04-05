@@ -61,59 +61,59 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <button 
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20"
+        className="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-green-600 to-purple-600 flex items-center justify-center shadow-lg shadow-green-500/20"
       >
-        <div className={`w-6 h-5 flex items-center justify-center relative transform transition-all duration-300 ${isMobileOpen ? 'rotate-90' : ''}`}>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-300 ${isMobileOpen ? 'rotate-45 top-2.5' : 'top-0.5'}`}></span>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-300 ${isMobileOpen ? 'opacity-0' : 'opacity-100'} top-2.5`}></span>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-300 ${isMobileOpen ? '-rotate-45 top-2.5' : 'top-4.5'}`}></span>
+        <div className={`w-6 h-5 flex items-center justify-center relative transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'rotate-90' : ''}`}>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'rotate-45 top-2.5' : 'top-0.5'}`}></span>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'opacity-0' : 'opacity-100'} top-2.5`}></span>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? '-rotate-45 top-2.5' : 'top-4.5'}`}></span>
         </div>
       </button>
 
-      <div className={`fixed md:relative inset-0 md:inset-auto z-40 transform transition-transform duration-300 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <div className={`fixed md:relative inset-0 md:inset-auto z-40 transform transition-transform duration-500 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="md:w-64 w-72 h-full">
           <div className="h-screen flex flex-col border-r border-gray-800 bg-black/95 backdrop-blur-sm relative overflow-hidden">
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-0 -left-32 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-20 -right-32 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-0 -left-32 w-64 h-64 bg-green-600/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-20 -right-32 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
             </div>
 
             {/* Profile Section */}
             {authUser && (
               <Link
                 to={`/profile/${authUser.username}`}
-                className="group p-5 hover:bg-purple-900/20 transition-all duration-500 relative overflow-hidden"
+                className="group p-5 hover:bg-green-900/20 transition-all duration-700 relative overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-900/0 via-purple-900/0 to-purple-900/0 group-hover:from-purple-900/0 group-hover:via-purple-900/20 group-hover:to-purple-900/0 transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-900/0 via-green-900/0 to-green-900/0 group-hover:from-green-900/0 group-hover:via-green-900/20 group-hover:to-green-900/0 transition-all duration-700"></div>
                 <div className="flex items-center gap-4 relative">
-                  <div className="relative w-12 h-12 flex-shrink-0 group-hover:scale-105 transition-all duration-300">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 opacity-80 group-hover:opacity-100 animate-pulse-slow"></div>
-                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-purple-500/50 group-hover:border-purple-400 transition-all duration-300">
+                  <div className="relative w-12 h-12 flex-shrink-0 group-hover:scale-105 transition-all duration-500">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500 to-purple-600 opacity-80 group-hover:opacity-100 animate-pulse-slow"></div>
+                    <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-green-500/50 group-hover:border-green-400 transition-all duration-500">
                       <img 
                         src={authUser?.profileImg || "/avatar-placeholder.png"} 
                         alt="Profile" 
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/0 to-pink-600/0 group-hover:from-purple-500/20 group-hover:to-pink-600/20 transition-all duration-300"></div>
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500/0 to-purple-600/0 group-hover:from-green-500/20 group-hover:to-purple-600/20 transition-all duration-500"></div>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-base font-semibold text-white line-clamp-1 group-hover:text-purple-300 transition-colors duration-300">
+                    <p className="text-base font-semibold text-white line-clamp-1 group-hover:text-green-300 transition-colors duration-500">
                       {authUser?.fullName}
                     </p>
-                    <p className="text-sm text-gray-400 group-hover:text-purple-400 transition-colors duration-300 truncate">
+                    <p className="text-sm text-gray-400 group-hover:text-green-400 transition-colors duration-500 truncate">
                       @{authUser?.username}
                     </p>
                     <div className="flex gap-4 mt-2">
-                      <span className="text-xs text-gray-300 group-hover:text-white transition-colors duration-300">
-                        <span className="font-medium text-purple-400 group-hover:text-purple-300 transition-colors duration-300">
+                      <span className="text-xs text-gray-300 group-hover:text-white transition-colors duration-500">
+                        <span className="font-medium text-green-400 group-hover:text-green-300 transition-colors duration-500">
                           {authUser?.following?.length || 0}
                         </span>{" "}
                         Following
                       </span>
-                      <span className="text-xs text-gray-300 group-hover:text-white transition-colors duration-300">
-                        <span className="font-medium text-purple-400 group-hover:text-purple-300 transition-colors duration-300">
+                      <span className="text-xs text-gray-300 group-hover:text-white transition-colors duration-500">
+                        <span className="font-medium text-green-400 group-hover:text-green-300 transition-colors duration-500">
                           {authUser?.followers?.length || 0}
                         </span>{" "}
                         Followers
@@ -134,25 +134,28 @@ const Sidebar = () => {
                     <li key={item.text}>
                       <Link
                         to={item.path}
-                        className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-300 relative overflow-hidden ${
+                        className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-500 relative overflow-hidden ${
                           isActive 
-                            ? "bg-gradient-to-r from-purple-900/60 to-purple-800/40 text-white"
-                            : "hover:bg-purple-900/20 text-gray-300 hover:text-white"
+                            ? "bg-gradient-to-r from-green-900/60 to-purple-800/40 text-white"
+                            : "hover:bg-green-900/20 text-gray-300 hover:text-white"
                         }`}
                       >
-                        <div className={`relative transition-all duration-300 ${isActive ? "text-purple-300" : "text-gray-400 group-hover:text-purple-400"}`}>
+                        <div className={`relative transition-all duration-500 ${isActive ? "text-green-300" : "text-gray-400 group-hover:text-green-400"}`}>
                           {item.icon}
                           {isActive && (
-                            <span className="absolute -left-1 -top-1 w-8 h-8 bg-purple-500/20 rounded-full blur-md animate-pulse-slow"></span>
+                            <span className="absolute -left-1 -top-1 w-8 h-8 bg-green-500/20 rounded-full blur-md animate-pulse-slow"></span>
                           )}
                         </div>
-                        <span className={`text-base font-medium transition-all duration-300 ${
+                        <span className={`text-base font-medium transition-all duration-500 ${
                           isActive ? "text-white" : "text-gray-300"
                         }`}>
                           {item.text}
                         </span>
                         {isActive && (
-                          <span className="absolute right-2 w-1.5 h-8 bg-gradient-to-b from-purple-400 to-pink-500 rounded-full"></span>
+                          <>
+                            <span className="absolute right-2 w-1.5 h-8 bg-gradient-to-b from-green-400 to-purple-500 rounded-full"></span>
+                            <span className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-purple-600/10 rounded-xl opacity-0 animate-pulse-slow"></span>
+                          </>
                         )}
                       </Link>
                     </li>
@@ -165,13 +168,13 @@ const Sidebar = () => {
             <div className="p-4 border-t border-gray-800/50">
               <button
                 onClick={() => logout()}
-                className="flex items-center gap-4 w-full p-3 rounded-xl hover:bg-red-900/20 transition-all duration-300 group relative overflow-hidden"
+                className="flex items-center gap-4 w-full p-3 rounded-xl hover:bg-red-900/20 transition-all duration-500 group relative overflow-hidden"
               >
                 <span className="relative w-6 h-6 flex items-center justify-center">
-                  <BiLogOut className="w-6 h-6 text-gray-400 group-hover:text-red-400 transition-colors duration-300" />
-                  <span className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 rounded-full transition-colors duration-300"></span>
+                  <BiLogOut className="w-6 h-6 text-gray-400 group-hover:text-red-400 transition-colors duration-500" />
+                  <span className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 rounded-full transition-colors duration-500"></span>
                 </span>
-                <span className="text-gray-400 group-hover:text-red-400 text-base font-medium transition-colors duration-300">
+                <span className="text-gray-400 group-hover:text-red-400 text-base font-medium transition-colors duration-500">
                   Logout
                 </span>
               </button>

@@ -48,24 +48,56 @@ const CreatePost = () => {
       toast.success("Post created successfully", {
         icon: "🚀",
         style: {
-          background: "#4c1d95",
-          color: "#f3e8ff",
-          border: "1px solid #a855f7",
+          background: "#111827",
+          color: "#10B981",
+          border: "1px solid #6D28D9",
+          borderRadius: "8px",
         },
       });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
+    onError: (error) => {
+      toast.error(error.message, {
+        style: {
+          background: "#111827",
+          color: "#EF4444",
+          border: "1px solid #6D28D9",
+          borderRadius: "8px",
+        },
+      });
+    }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!text.trim() && !img) return;
+    if (!text.trim() && !img) {
+      toast.error("Post cannot be empty", {
+        style: {
+          background: "#111827",
+          color: "#EF4444",
+          border: "1px solid #6D28D9",
+          borderRadius: "8px",
+        },
+      });
+      return;
+    }
     createPost({ text, img });
   };
 
   const handleImgChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast.error("Image size should be less than 2MB", {
+          style: {
+            background: "#111827",
+            color: "#EF4444",
+            border: "1px solid #6D28D9",
+            borderRadius: "8px",
+          },
+        });
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         setImg(reader.result);
@@ -87,14 +119,38 @@ const CreatePost = () => {
     e.preventDefault();
     setIsDragging(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImg(reader.result);
-      };
-      reader.readAsDataURL(file);
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file", {
+        style: {
+          background: "#111827",
+          color: "#EF4444",
+          border: "1px solid #6D28D9",
+          borderRadius: "8px",
+        },
+      });
+      return;
     }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image size should be less than 2MB", {
+        style: {
+          background: "#111827",
+          color: "#EF4444",
+          border: "1px solid #6D28D9",
+          borderRadius: "8px",
+        },
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImg(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleTextareaFocus = () => {
@@ -117,17 +173,14 @@ const CreatePost = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="flex p-4 items-start gap-4 border-b border-purple-300/10 bg-gradient-to-b from-purple-950/40 to-purple-900/10 backdrop-blur-sm shadow-md"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      className="flex p-4 items-start gap-4 border-b border-gray-800 bg-gray-900 shadow-md"
     >
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="avatar mt-1"
       >
-        <div className="w-10 h-10 rounded-full ring-2 ring-purple-500 overflow-hidden shadow-lg shadow-purple-500/20">
+        <div className="w-10 h-10 rounded-full ring-2 ring-green-500 overflow-hidden shadow-lg shadow-green-500/20">
           <motion.img 
             src={authUser?.profileImg || "/avatar-placeholder.png"} 
             alt="User Avatar"
@@ -138,12 +191,18 @@ const CreatePost = () => {
         </div>
       </motion.div>
       
-      <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit}>
-        <div className={`relative transition-all duration-300 ${isDragging ? 'border-2 border-dashed border-purple-400 bg-purple-900/20 rounded-lg p-3' : ''}`}>
+      <form 
+        className="flex flex-col gap-3 w-full" 
+        onSubmit={handleSubmit}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <div className={`relative transition-all duration-300 ${isDragging ? 'border-2 border-dashed border-green-500 bg-gray-800/50 rounded-lg p-3' : ''}`}>
           <motion.textarea
             ref={textareaRef}
             whileFocus={{ scale: 1.01 }}
-            className="w-full p-2 text-lg resize-none border-none focus:outline-none bg-purple-900/20 text-purple-100 placeholder-purple-400/50 rounded-lg min-h-[60px] transition-all duration-300"
+            className="w-full p-2 text-lg resize-none border-none focus:outline-none bg-gray-800 text-white placeholder-gray-400 rounded-lg min-h-[60px] transition-all duration-300"
             placeholder="What's on your mind?"
             value={text}
             onChange={handleTextareaChange}
@@ -156,8 +215,8 @@ const CreatePost = () => {
           />
           
           {isDragging && (
-            <div className="absolute inset-0 flex items-center justify-center bg-purple-900/50 rounded-lg backdrop-blur-sm pointer-events-none">
-              <p className="text-purple-200 font-medium">Drop your image here</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800/80 rounded-lg backdrop-blur-sm pointer-events-none">
+              <p className="text-green-400 font-medium">Drop your image here</p>
             </div>
           )}
         </div>
@@ -173,7 +232,7 @@ const CreatePost = () => {
             >
               <div className="relative group rounded-xl overflow-hidden border border-purple-500/30 shadow-lg shadow-purple-500/10">
                 <motion.div
-                  className="absolute top-2 right-2 text-white bg-purple-800 rounded-full w-8 h-8 cursor-pointer flex items-center justify-center z-10 opacity-80 hover:opacity-100"
+                  className="absolute top-2 right-2 text-white bg-gray-800 rounded-full w-8 h-8 cursor-pointer flex items-center justify-center z-10 opacity-80 hover:opacity-100"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => {
@@ -195,7 +254,7 @@ const CreatePost = () => {
                     alt="Post preview" 
                   />
                   <motion.div 
-                    className="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   />
                 </motion.div>
               </div>
@@ -203,7 +262,7 @@ const CreatePost = () => {
           )}
         </AnimatePresence>
 
-        <div className="flex justify-between items-center border-t py-3 border-t-purple-300/10">
+        <div className="flex justify-between items-center border-t py-3 border-t-gray-700">
           <div className="flex gap-4 items-center">
             <motion.div
               whileHover={{ scale: 1.1, y: -2 }}
@@ -211,11 +270,11 @@ const CreatePost = () => {
               className="relative group"
             >
               <CiImageOn
-                className="text-purple-400 w-6 h-6 cursor-pointer group-hover:text-purple-300 transition-colors duration-300"
+                className="text-green-500 w-6 h-6 cursor-pointer group-hover:text-green-400 transition-colors duration-300"
                 onClick={() => imgRef.current.click()}
               />
               <motion.span 
-                className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-purple-300 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-purple-900/90 px-2 py-1 rounded"
+                className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-300 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-gray-800 px-2 py-1 rounded"
                 initial={{ y: 5 }}
                 whileHover={{ y: 0 }}
               >
@@ -228,9 +287,9 @@ const CreatePost = () => {
               whileTap={{ scale: 0.9 }}
               className="relative group"
             >
-              <BsEmojiSmileFill className="text-purple-400 w-5 h-5 cursor-pointer group-hover:text-purple-300 transition-colors duration-300" />
+              <BsEmojiSmileFill className="text-purple-500 w-5 h-5 cursor-pointer group-hover:text-purple-400 transition-colors duration-300" />
               <motion.span 
-                className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-purple-300 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-purple-900/90 px-2 py-1 rounded"
+                className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-300 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-gray-800 px-2 py-1 rounded"
                 initial={{ y: 5 }}
                 whileHover={{ y: 0 }}
               >
@@ -239,15 +298,21 @@ const CreatePost = () => {
             </motion.div>
           </div>
           
-          <input type="file" accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
+          <input 
+            type="file" 
+            accept="image/*" 
+            hidden 
+            ref={imgRef} 
+            onChange={handleImgChange} 
+          />
           
           <motion.button 
-            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(147, 51, 234, 0.5)" }}
+            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(16, 185, 129, 0.5)" }}
             whileTap={{ scale: 0.95 }}
             className={`flex items-center gap-2 py-2 px-6 rounded-full font-medium transition-all duration-300 ${
               !text.trim() && !img 
-                ? "bg-purple-700/50 text-purple-300/70 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-md shadow-purple-700/30 hover:shadow-lg hover:shadow-purple-700/40"
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-green-600 to-purple-600 text-white shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/30"
             }`}
             disabled={isPending || (!text.trim() && !img)}
             type="submit"
@@ -277,10 +342,10 @@ const CreatePost = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="text-purple-300 bg-purple-900/70 p-3 rounded-lg text-sm border border-purple-700/50 shadow-md"
+              className="text-red-400 bg-gray-800 p-3 rounded-lg text-sm border border-red-500/30 shadow-md"
             >
               <div className="flex items-center gap-2">
-                <BsXCircleFill className="text-purple-400 flex-shrink-0" />
+                <BsXCircleFill className="text-red-500 flex-shrink-0" />
                 <span>{error.message}</span>
               </div>
             </motion.div>

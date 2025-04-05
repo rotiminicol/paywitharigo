@@ -18,6 +18,7 @@ import SpacePage from "./pages/Space";
 import Search from "./pages/Search";
 import Miamour from "./pages/Miamour";
 import Verification from "./pages/Verification";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -52,6 +53,7 @@ function App() {
       {authUser && <Sidebar />}
       <div className="flex-1 overflow-y-auto">
         <Routes>
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
           <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
           <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/verification" />} />
