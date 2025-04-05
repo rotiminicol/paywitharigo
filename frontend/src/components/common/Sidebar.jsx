@@ -1,4 +1,4 @@
-import { MdHomeFilled, MdWork, MdList, MdGroups, MdMonetizationOn, MdShoppingBag, MdSearch } from "react-icons/md";
+import { MdHomeFilled, MdWork, MdList, MdGroups, MdMonetizationOn, MdShoppingBag, MdSearch, MdMessage } from "react-icons/md";
 import { IoNotifications, IoRocket } from "react-icons/io5";
 import { FaUser, FaHeart } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
@@ -7,21 +7,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 
+
 const Sidebar = () => {
   const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const queryClient = useQueryClient();
+
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch("/api/auth/logout", {
-          method: "POST",
-        });
+        const res = await fetch("/api/auth/logout", { method: "POST" });
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
-        }
+        if (!res.ok) throw new Error(data.error || "Something went wrong");
       } catch (error) {
         throw new Error(error);
       }
@@ -34,10 +31,9 @@ const Sidebar = () => {
       toast.error("Logout failed");
     },
   });
-  
+
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
-  // Close mobile sidebar when route changes
   useEffect(() => {
     setIsMobileOpen(false);
   }, [location.pathname]);
@@ -46,6 +42,7 @@ const Sidebar = () => {
     { icon: <MdHomeFilled className="w-6 h-6" />, text: "Home", path: "/" },
     { icon: <MdSearch className="w-6 h-6" />, text: "Search", path: "/search" },
     { icon: <IoNotifications className="w-6 h-6" />, text: "Notifications", path: "/notifications" },
+    { icon: <MdMessage className="w-6 h-6" />, text: "Messages", path: "/messages" }, // Moved after Notifications
     { icon: <MdWork className="w-6 h-6" />, text: "Jobs", path: "/jobs" },
     { icon: <MdList className="w-6 h-6" />, text: "Lists", path: "/lists" },
     { icon: <MdMonetizationOn className="w-6 h-6" />, text: "Monetization", path: "/monetization" },
@@ -59,18 +56,18 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Toggle Button */}
-      <button 
+      <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-green-600 to-purple-600 flex items-center justify-center shadow-lg shadow-green-500/20"
       >
-        <div className={`w-6 h-5 flex items-center justify-center relative transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'rotate-90' : ''}`}>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'rotate-45 top-2.5' : 'top-0.5'}`}></span>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? 'opacity-0' : 'opacity-100'} top-2.5`}></span>
-          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? '-rotate-45 top-2.5' : 'top-4.5'}`}></span>
+        <div className={`w-6 h-5 flex items-center justify-center relative transform transition-all duration-500 ease-in-out ${isMobileOpen ? "rotate-90" : ""}`}>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? "rotate-45 top-2.5" : "top-0.5"}`}></span>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? "opacity-0" : "opacity-100"} top-2.5`}></span>
+          <span className={`absolute h-0.5 w-6 bg-white transform transition-all duration-500 ease-in-out ${isMobileOpen ? "-rotate-45 top-2.5" : "top-4.5"}`}></span>
         </div>
       </button>
 
-      <div className={`fixed md:relative inset-0 md:inset-auto z-40 transform transition-transform duration-500 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <div className={`fixed md:relative inset-0 md:inset-auto z-40 transform transition-transform duration-500 ease-in-out ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <div className="md:w-64 w-72 h-full">
           <div className="h-screen flex flex-col border-r border-gray-800 bg-black/95 backdrop-blur-sm relative overflow-hidden">
             {/* Animated Background Elements */}
@@ -90,9 +87,9 @@ const Sidebar = () => {
                   <div className="relative w-12 h-12 flex-shrink-0 group-hover:scale-105 transition-all duration-500">
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500 to-purple-600 opacity-80 group-hover:opacity-100 animate-pulse-slow"></div>
                     <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-green-500/50 group-hover:border-green-400 transition-all duration-500">
-                      <img 
-                        src={authUser?.profileImg || "/avatar-placeholder.png"} 
-                        alt="Profile" 
+                      <img
+                        src={authUser?.profileImg || "/avatar-placeholder.png"}
+                        alt="Profile"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -125,30 +122,37 @@ const Sidebar = () => {
             )}
 
             {/* Navigation Menu */}
-            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide smooth-scroll" >
+            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide smooth-scroll">
               <ul className="flex flex-col gap-2">
                 {navigationItems.map((item) => {
-                  const isActive = location.pathname === item.path || 
-                                  (item.path.includes('profile') && location.pathname.includes('profile'));
+                  const isActive =
+                    location.pathname === item.path ||
+                    (item.path?.includes("profile") && location.pathname.includes("profile"));
                   return (
                     <li key={item.text}>
                       <Link
                         to={item.path}
-                        className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-500 relative overflow-hidden ${
-                          isActive 
+                        className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-500 relative overflow-hidden cursor-pointer ${
+                          isActive
                             ? "bg-gradient-to-r from-green-900/60 to-purple-800/40 text-white"
                             : "hover:bg-green-900/20 text-gray-300 hover:text-white"
                         }`}
                       >
-                        <div className={`relative transition-all duration-500 ${isActive ? "text-green-300" : "text-gray-400 group-hover:text-green-400"}`}>
+                        <div
+                          className={`relative transition-all duration-500 ${
+                            isActive ? "text-green-300" : "text-gray-400 group-hover:text-green-400"
+                          }`}
+                        >
                           {item.icon}
                           {isActive && (
                             <span className="absolute -left-1 -top-1 w-8 h-8 bg-green-500/20 rounded-full blur-md animate-pulse-slow"></span>
                           )}
                         </div>
-                        <span className={`text-base font-medium transition-all duration-500 ${
-                          isActive ? "text-white" : "text-gray-300"
-                        }`}>
+                        <span
+                          className={`text-base font-medium transition-all duration-500 ${
+                            isActive ? "text-white" : "text-gray-300"
+                          }`}
+                        >
                           {item.text}
                         </span>
                         {isActive && (

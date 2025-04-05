@@ -19,6 +19,7 @@ import Search from "./pages/Search";
 import Miamour from "./pages/Miamour";
 import Verification from "./pages/Verification";
 import LandingPage from "./pages/LandingPage";
+import Messages from "./pages/Messages"
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -61,6 +62,10 @@ function App() {
           <Route
             path="/notifications"
             element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
+          />
+           <Route
+            path="/messages"
+            element={authUser ? <Messages /> : <Navigate to="/login" />}
           />
           <Route
             path="/profile/:username"
