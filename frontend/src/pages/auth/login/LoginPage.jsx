@@ -117,7 +117,7 @@ const LoginPage = () => {
             className="text-center md:text-left px-4 md:px-0"
           >
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text mb-4">
-              Welcome to iJuewa
+              Welcome to iJeuwa
             </h2>
             <p className="text-gray-400 text-lg max-w-md">
               Your gateway to seamless digital experiences. Sign in to continue your journey of innovation and discovery.
@@ -144,7 +144,7 @@ const LoginPage = () => {
                 <span className="text-white font-bold text-xl">IJ</span>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text">
-                iJuewa
+                iJeuwa
               </span>
             </div>
           </motion.div>

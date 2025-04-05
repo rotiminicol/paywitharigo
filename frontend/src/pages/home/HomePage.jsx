@@ -218,8 +218,7 @@ const HomePage = () => {
               }}
               transition={{ duration: 6, repeat: Infinity }}
             >
-              Ijuewa
-            </motion.h1>
+              Ijeuwa            </motion.h1>
           </motion.div>
         </div>
 

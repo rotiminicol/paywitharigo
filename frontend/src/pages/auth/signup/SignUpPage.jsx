@@ -81,7 +81,7 @@ const SignUpPage = () => {
               <span className="text-white font-bold text-xl">IJ</span>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text">
-              iJuewa
+              iJeuwa
             </span>
           </div>
         </motion.div>
@@ -104,7 +104,7 @@ const SignUpPage = () => {
               <span className="text-white font-bold text-xl">IJ</span>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text">
-              iJuewa
+              iJeuwa
             </span>
           </motion.div>
 
