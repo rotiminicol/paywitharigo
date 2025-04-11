@@ -1,57 +1,41 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Lock, Mail, ChevronRight } from "lucide-react";
+import { DollarSign } from "lucide-react";
 
-const Verification = () => {
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+const VerificationPage = () => {
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
-  const [feedback, setFeedback] = useState({ type: '', message: '' });
-  const [stage, setStage] = useState('email'); // email -> code -> success
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+  const [stage, setStage] = useState("email"); // email -> code -> success
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
-        duration: 0.6,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.6, ease: "easeOut" },
     },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.4
-      }
-    }
+    exit: { opacity: 0, y: -20, transition: { duration: 0.4 } },
   };
 
   const buttonVariants = {
-    hover: { 
-      scale: 1.03,
-      backgroundColor: "#9333ea",
-      transition: { duration: 0.2 }
-    },
+    hover: { scale: 1.03, transition: { duration: 0.2 } },
     tap: { scale: 0.97 },
-    disabled: {
-      opacity: 0.7,
-      scale: 1
-    }
+    disabled: { opacity: 0.7, scale: 1 },
   };
 
   // Timer for code resend cooldown
   useEffect(() => {
     let timer;
     if (isCodeSent && timeLeft > 0 && !canResend) {
-      timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
+      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     } else if (timeLeft === 0) {
       setCanResend(true);
     }
@@ -61,28 +45,25 @@ const Verification = () => {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setFeedback({ type: '', message: '' });
-    
-    // Email validation
+    setFeedback({ type: "", message: "" });
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setFeedback({ type: 'error', message: 'Please enter a valid email address' });
+      setFeedback({ type: "error", message: "Please enter a valid email address" });
       setLoading(false);
       return;
     }
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate API call to send verification code
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       setIsCodeSent(true);
-      setStage('code');
-      setFeedback({ type: 'success', message: 'Verification code sent!' });
-      
-      // Reset timer for resend
+      setStage("code");
+      setFeedback({ type: "success", message: "Verification code sent to your email!" });
       setTimeLeft(60);
       setCanResend(false);
     } catch (error) {
-      setFeedback({ type: 'error', message: 'Failed to send code. Please try again.' });
+      setFeedback({ type: "error", message: "Failed to send code. Please try again." });
     }
     setLoading(false);
   };
@@ -90,20 +71,17 @@ const Verification = () => {
   const handleResendCode = async (e) => {
     e.preventDefault();
     if (!canResend) return;
-    
+
     setLoading(true);
-    setFeedback({ type: '', message: '' });
-    
-    // Simulate API call
+    setFeedback({ type: "", message: "" });
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setFeedback({ type: 'success', message: 'New code sent!' });
-      
-      // Reset timer for resend
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setFeedback({ type: "success", message: "New code sent!" });
       setTimeLeft(60);
       setCanResend(false);
     } catch (error) {
-      setFeedback({ type: 'error', message: 'Failed to resend code. Please try again.' });
+      setFeedback({ type: "error", message: "Failed to resend code. Please try again." });
     }
     setLoading(false);
   };
@@ -111,37 +89,33 @@ const Verification = () => {
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setFeedback({ type: '', message: '' });
-    
-    // Check if code is complete
-    const fullCode = code.join('');
+    setFeedback({ type: "", message: "" });
+
+    const fullCode = code.join("");
     if (fullCode.length !== 6) {
-      setFeedback({ type: 'error', message: 'Please enter the complete 6-digit code' });
+      setFeedback({ type: "error", message: "Please enter the complete 6-digit code" });
       setLoading(false);
       return;
     }
-    
-    // Simulate API call to verify code
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1800));
-      // Success scenario
-      setFeedback({ type: 'success', message: 'Verification successful!' });
-      setStage('success');
+      // Simulate API call to verify code
+      await new Promise((resolve) => setTimeout(resolve, 1800));
+      setFeedback({ type: "success", message: "Verification successful!" });
+      setStage("success");
     } catch (error) {
-      setFeedback({ type: 'error', message: 'Invalid code. Please try again.' });
+      setFeedback({ type: "error", message: "Invalid code. Please try again." });
     }
     setLoading(false);
   };
 
   const handleCodeChange = (index, value) => {
-    // Only allow numbers
     if (value && !/^\d*$/.test(value)) return;
-    
+
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-    
-    // Auto-focus next input
+
     if (value && index < 5) {
       const nextInput = document.getElementById(`code-input-${index + 1}`);
       if (nextInput) nextInput.focus();
@@ -149,8 +123,7 @@ const Verification = () => {
   };
 
   const handleCodeKeyDown = (index, e) => {
-    // Handle backspace - focus previous input
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
       const prevInput = document.getElementById(`code-input-${index - 1}`);
       if (prevInput) prevInput.focus();
     }
@@ -158,353 +131,415 @@ const Verification = () => {
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').trim();
-    
-    // Check if pasted content is only digits and right length
+    const pastedData = e.clipboardData.getData("text").trim();
+
     if (/^\d+$/.test(pastedData) && pastedData.length <= 6) {
-      const digits = pastedData.split('').slice(0, 6);
+      const digits = pastedData.split("").slice(0, 6);
       const newCode = [...code];
-      
+
       digits.forEach((digit, index) => {
         if (index < 6) newCode[index] = digit;
       });
-      
+
       setCode(newCode);
-      
-      // Focus on the next empty input or the last input
-      const nextEmptyIndex = newCode.findIndex(c => c === '');
+
+      const nextEmptyIndex = newCode.findIndex((c) => c === "");
       if (nextEmptyIndex !== -1) {
         const nextInput = document.getElementById(`code-input-${nextEmptyIndex}`);
         if (nextInput) nextInput.focus();
       } else {
-        const lastInput = document.getElementById(`code-input-5`);
+        const lastInput = document.getElementById("code-input-5");
         if (lastInput) lastInput.focus();
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black to-gray-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 opacity-20">
-          {[...Array(20)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full bg-purple-500"
-              style={{
-                width: `${Math.random() * 6 + 1}px`,
-                height: `${Math.random() * 6 + 1}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                filter: 'blur(1px)',
-                opacity: Math.random() * 0.8 + 0.2,
-                animation: `float ${Math.random() * 10 + 10}s infinite linear`
-              }}
-            />
-          ))}
-        </div>
+    <div className="min-h-screen w-full bg-white text-gray-900 flex items-center justify-center p-4">
+      {/* Subtle background gradient */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-white"></div>
+
+      {/* Floating particles */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(10)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.2, scale: 1 }}
+            transition={{ duration: 2, delay: i * 0.3, repeat: Infinity, repeatType: "reverse" }}
+            className="absolute rounded-full bg-blue-400"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 6 + 4}px`,
+              height: `${Math.random() * 6 + 4}px`,
+            }}
+          />
+        ))}
       </div>
-      
-      <AnimatePresence mode="wait">
-        {stage === 'email' && (
-          <motion.div 
-            key="email-form"
-            className="bg-gray-900 w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-800 relative overflow-hidden"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-80" />
-            
-            <div className="flex justify-center mb-6">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-            </div>
-            
-            <h1 className="text-3xl font-bold text-white mb-2 text-center">
-              Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">ijeuwa</span>
-            </h1>
-            <p className="text-gray-400 text-center mb-8">
-              Lets verify your identity to get started
-            </p>
 
-            {feedback.message && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }}
-                className={`p-3 rounded-md mb-4 text-sm ${
-                  feedback.type === 'error' 
-                    ? 'bg-red-900/30 text-red-200 border border-red-800' 
-                    : 'bg-green-900/30 text-green-200 border border-green-800'
-                }`}
-              >
-                {feedback.message}
-              </motion.div>
-            )}
-
-            <form onSubmit={handleEmailSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 bg-gray-800/70 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                    placeholder="Enter your email"
-                    required
-                    disabled={loading}
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                </div>
-                <p className="mt-1.5 text-xs text-gray-500">
-                  Well send a verification code to this email
-                </p>
-              </div>
-              
-              <motion.button
-                type="submit"
-                disabled={loading}
-                variants={buttonVariants}
-                whileHover={loading ? "" : "hover"}
-                whileTap={loading ? "" : "tap"}
-                animate={loading ? "disabled" : ""}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center"
-              >
-                {loading ? (
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : null}
-                {loading ? 'Sending...' : 'Send Verification Code'}
-              </motion.button>
-            </form>
-
-            <div className="mt-8 text-center border-t border-gray-800 pt-6">
-              <p className="text-gray-500 text-sm">
-                Already have an account?{' '}
-                <a href="#" className="text-purple-400 hover:text-purple-300 transition-colors">
-                  Log in
-                </a>
-              </p>
-            </div>
-          </motion.div>
-        )}
-
-        {stage === 'code' && (
-          <motion.div 
-            key="code-form"
-            className="bg-gray-900 w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-800 relative overflow-hidden"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-80" />
-            
-            <button 
-              onClick={() => setStage('email')}
-              className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors"
+      <div className="max-w-6xl w-full relative z-10 flex flex-col md:flex-row rounded-xl overflow-hidden">
+        {/* Left Section - Verification Form */}
+        <AnimatePresence mode="wait">
+          {stage === "email" && (
+            <motion.div
+              key="email-form"
+              className="w-full md:w-1/2 bg-white border border-blue-100 rounded-xl md:rounded-r-none p-8 shadow-lg max-w-md mx-auto md:mx-0"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-            </button>
-            
-            <div className="flex justify-center mb-6">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-            </div>
-            
-            <h1 className="text-2xl font-bold text-white mb-2 text-center">
-              Check your inbox
-            </h1>
-            <p className="text-gray-400 text-center mb-6">
-              Weve sent a 6-digit verification code to <span className="text-white font-medium">{email}</span>
-            </p>
-
-            {feedback.message && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }}
-                className={`p-3 rounded-md mb-4 text-sm ${
-                  feedback.type === 'error' 
-                    ? 'bg-red-900/30 text-red-200 border border-red-800' 
-                    : 'bg-green-900/30 text-green-200 border border-green-800'
-                }`}
-              >
-                {feedback.message}
-              </motion.div>
-            )}
-
-            <form onSubmit={handleCodeSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">
-                  Enter verification code
-                </label>
-                <div 
-                  className="flex gap-2 justify-between mb-2"
-                  onPaste={handlePaste}
+              <div className="flex items-center space-x-2 mb-6">
+                <motion.div
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center"
                 >
-                  {code.map((digit, index) => (
+                  <DollarSign size={20} className="text-white" />
+                </motion.div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                  Arigo Pay
+                </span>
+              </div>
+
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Verify Your Identity
+              </h1>
+              <p className="text-gray-600 flex items-center gap-2 mb-6">
+                <Lock size={16} className="text-blue-600" />
+                Enter your email to receive a secure verification code
+              </p>
+
+              {feedback.message && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-3 rounded-md mb-4 text-sm ${
+                    feedback.type === "error"
+                      ? "bg-red-100 text-red-700 border border-red-200"
+                      : "bg-blue-100 text-blue-700 border border-blue-200"
+                  }`}
+                >
+                  {feedback.message}
+                </motion.div>
+              )}
+
+              <form onSubmit={handleEmailSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-600">
+                      <Mail size={20} />
+                    </div>
                     <input
-                      key={index}
-                      id={`code-input-${index}`}
-                      type="text"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleCodeChange(index, e.target.value)}
-                      onKeyDown={(e) => handleCodeKeyDown(index, e)}
-                      className="w-full h-14 bg-gray-800/70 border border-gray-700 rounded-lg text-white text-xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
+                      placeholder="Enter your email"
+                      required
                       disabled={loading}
                     />
-                  ))}
+                  </div>
+                  <p className="mt-1.5 text-xs text-gray-600">
+                    We’ll send a 6-digit code to this email
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  The code will expire in 5 minutes
-                </p>
-              </div>
-              
-              <motion.button
-                type="submit"
-                disabled={loading}
-                variants={buttonVariants}
-                whileHover={loading ? "" : "hover"}
-                whileTap={loading ? "" : "tap"}
-                animate={loading ? "disabled" : ""}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center"
-              >
-                {loading ? (
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : null}
-                {loading ? 'Verifying...' : 'Verify Code'}
-              </motion.button>
-              
-              <div className="text-center pt-1">
-                <p className="text-sm text-gray-400">
-                  Didnt receive a code?{' '}
-                  {canResend ? (
-                    <button 
-                      onClick={handleResendCode}
-                      disabled={loading}
-                      className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
-                    >
-                      Resend
-                    </button>
-                  ) : (
-                    <span className="text-gray-500">
-                      Resend in {timeLeft}s
-                    </span>
-                  )}
-                </p>
-              </div>
-            </form>
 
-            <div className="mt-8 text-center border-t border-gray-800 pt-6">
-              <p className="text-gray-500 text-sm">
-                Having issues?{' '}
-                <a href="mailto:support@ijeuwa.com" className="text-purple-400 hover:text-purple-300 transition-colors">
-                  Contact support
-                </a>
-              </p>
-            </div>
-          </motion.div>
-        )}
-
-        {stage === 'success' && (
-          <motion.div 
-            key="success-screen"
-            className="bg-gray-900 w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-800 relative overflow-hidden"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-teal-500 to-green-500 opacity-80" />
-            
-            <div className="flex justify-center mb-6">
-              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center shadow-lg">
-                <motion.svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-10 w-10 text-white" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 260, 
-                    damping: 20,
-                    delay: 0.3 
-                  }}
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  variants={buttonVariants}
+                  whileHover={loading ? "" : "hover"}
+                  whileTap={loading ? "" : "tap"}
+                  animate={loading ? "disabled" : ""}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-md flex items-center justify-center"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </motion.svg>
+                  {loading ? (
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : null}
+                  {loading ? "Sending..." : "Send Verification Code"}
+                </motion.button>
+              </form>
+            </motion.div>
+          )}
+
+          {stage === "code" && (
+            <motion.div
+              key="code-form"
+              className="w-full md:w-1/2 bg-white border border-blue-100 rounded-xl md:rounded-r-none p-8 shadow-lg max-w-md mx-auto md:mx-0"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <div className="flex items-center space-x-2 mb-6">
+                <motion.div
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center"
+                >
+                  <DollarSign size={20} className="text-white" />
+                </motion.div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                  Arigo Pay
+                </span>
               </div>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <h1 className="text-2xl font-bold text-white mb-2 text-center">
-                Verification Complete!
+
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Enter Verification Code
               </h1>
-              <p className="text-gray-400 text-center mb-8">
-                Your account has been successfully verified
+              <p className="text-gray-600 mb-6">
+                We’ve sent a 6-digit code to{" "}
+                <span className="font-medium text-blue-600">{email}</span>
               </p>
-            </motion.div>
 
+              {feedback.message && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-3 rounded-md mb-4 text-sm ${
+                    feedback.type === "error"
+                      ? "bg-red-100 text-red-700 border border-red-200"
+                      : "bg-blue-100 text-blue-700 border border-blue-200"
+                  }`}
+                >
+                  {feedback.message}
+                </motion.div>
+              )}
+
+              <form onSubmit={handleCodeSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    6-Digit Code
+                  </label>
+                  <div className="flex gap-2 justify-between mb-2" onPaste={handlePaste}>
+                    {code.map((digit, index) => (
+                      <input
+                        key={index}
+                        id={`code-input-${index}`}
+                        type="text"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleCodeChange(index, e.target.value)}
+                        onKeyDown={(e) => handleCodeKeyDown(index, e)}
+                        className="w-full h-14 bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg text-xl font-bold text-center focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
+                        disabled={loading}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">
+                    The code expires in 5 minutes
+                  </p>
+                </div>
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  variants={buttonVariants}
+                  whileHover={loading ? "" : "hover"}
+                  whileTap={loading ? "" : "tap"}
+                  animate={loading ? "disabled" : ""}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-md flex items-center justify-center"
+                >
+                  {loading ? (
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : null}
+                  {loading ? "Verifying..." : "Verify Code"}
+                </motion.button>
+
+                <div className="text-center pt-1">
+                  <p className="text-sm text-gray-600">
+                    Didn’t receive a code?{" "}
+                    {canResend ? (
+                      <button
+                        onClick={handleResendCode}
+                        disabled={loading}
+                        className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
+                      >
+                        Resend
+                      </button>
+                    ) : (
+                      <span className="text-gray-500">Resend in {timeLeft}s</span>
+                    )}
+                  </p>
+                </div>
+              </form>
+            </motion.div>
+          )}
+
+          {stage === "success" && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              key="success-screen"
+              className="w-full md:w-1/2 bg-white border border-blue-100 rounded-xl md:rounded-r-none p-8 shadow-lg max-w-md mx-auto md:mx-0"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center"
-                onClick={() => navigate('/')}
+              <div className="flex items-center space-x-2 mb-6">
+                <motion.div
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center"
+                >
+                  <DollarSign size={20} className="text-white" />
+                </motion.div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                  Arigo Pay
+                </span>
+              </div>
+
+              <div className="flex justify-center mb-6">
+                <motion.div
+                  className="h-20 w-20 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center shadow-lg"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                >
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </motion.svg>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
               >
-                Continue to Dashboard
-              </motion.button>
-            </motion.div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+                  Verification Successful!
+                </h1>
+                <p className="text-gray-600 text-center mb-8">
+                  Your Arigo Pay account is now verified and ready to use.
+                </p>
+              </motion.div>
 
-            <motion.div
-              className="mt-6 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-            >
-              <p className="text-gray-500 text-sm">
-                Thank you for joining <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">ijeuwa</span>
-              </p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <motion.button
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-md flex items-center justify-center"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Continue to Dashboard
+                  <ChevronRight size={20} className="ml-2" />
+                </motion.button>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+
+        {/* Right Section - Illustration */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl rounded-l-none items-center justify-center p-8 relative overflow-hidden"
+        >
+          {/* Abstract shapes */}
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute w-64 h-64 rounded-full bg-blue-200/30 -top-20 -right-20"
+          ></motion.div>
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute w-48 h-48 rounded-full bg-blue-300/30 -bottom-10 -left-10"
+          ></motion.div>
+
+          {/* SVG Illustration - Banking Theme */}
+          <div className="relative z-10 w-full max-w-md">
+            <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="250" cy="200" r="120" fill="rgba(59, 130, 246, 0.1)" />
+              <circle cx="250" cy="200" r="80" fill="rgba(147, 197, 253, 0.1)" />
+              <motion.rect
+                x="150"
+                y="120"
+                width="200"
+                height="120"
+                rx="15"
+                fill="rgba(59, 130, 246, 0.3)"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <rect x="160" y="130" width="180" height="20" rx="5" fill="rgba(255, 255, 255, 0.5)" />
+              <rect x="160" y="160" width="120" height="15" rx="5" fill="rgba(255, 255, 255, 0.3)" />
+              <circle cx="320" cy="190" r="10" fill="rgba(147, 197, 253, 0.5)" />
+            </svg>
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+                Secure Banking Starts Here
+              </h2>
+              <p className="text-gray-600 text-lg max-w-xs">
+                Verify your identity to unlock the full power of Arigo Pay.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
 
-export default Verification;
+export default VerificationPage;

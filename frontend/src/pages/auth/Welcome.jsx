@@ -1,40 +1,58 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Mail, Lock, User, DollarSign, Eye, EyeOff } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { DollarSign, Lock, Phone, Calendar, MapPin, User, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 
-const SignUpPage = () => {
+const WelcomePage = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    fullName: "",
-    password: "",
+    phoneNumber: "",
+    dateOfBirth: "",
+    address: "",
+    gender: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { mutate, isError, isPending, error } = useMutation({
-    mutationFn: async ({ email, fullName, password }) => {
-      const res = await fetch("/api/auth/signup", {
+  // Generate a random 10-digit account number (demo purposes)
+  const generateAccountNumber = () => {
+    return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+  };
+
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: async (data) => {
+      // Mock userId from auth context (replace with actual user data)
+      const userId = "mock-user-id-123"; // Replace with auth context or token
+
+      // Simulate account number generation (replace with backend logic)
+      const accountNumber = generateAccountNumber();
+
+      // Mock API call to save data
+      const res = await fetch("/api/account/setup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, fullName, password }),
+        body: JSON.stringify({
+          userId,
+          accountNumber,
+          ...data,
+        }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create account");
-      return data;
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to complete setup");
+      return result;
     },
     onSuccess: () => {
-      toast.success("Account created successfully");
+      toast.success("Account setup completed successfully!");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/dashboard"); // Redirect to dashboard or next step
     },
     onError: () => {
-      toast.error("Failed to create account. Please try again.");
+      toast.error("Failed to complete setup. Please try again.");
     },
   });
 
@@ -72,7 +90,7 @@ const SignUpPage = () => {
       </div>
 
       <div className="max-w-6xl w-full relative z-10 flex flex-col md:flex-row rounded-xl overflow-hidden">
-        {/* Logo/Brand - visible only on mobile */}
+        {/* Logo/Brand - Mobile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -86,20 +104,20 @@ const SignUpPage = () => {
             >
               <DollarSign size={20} className="text-white" />
             </motion.div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 text-transparent bg-clip-text">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
               Arigo Pay
             </span>
           </div>
         </motion.div>
 
-        {/* Left section - Sign Up Form */}
+        {/* Left Section - Form */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full md:w-1/2 bg-white border border-blue-100 rounded-xl md:rounded-r-none p-8 shadow-lg max-w-md mx-auto md:mx-0"
         >
-          {/* Logo/Brand - visible on desktop */}
+          {/* Logo/Brand - Desktop */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,106 +130,129 @@ const SignUpPage = () => {
             >
               <DollarSign size={20} className="text-white" />
             </motion.div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 text-transparent bg-clip-text">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
               Arigo Pay
             </span>
           </motion.div>
 
           <div className="text-left mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Open Your Account</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Arigo Pay!</h1>
             <p className="text-gray-600 flex items-center gap-2">
               <Lock size={16} className="text-blue-600" />
-              Securely join Arigo Pay today
+              Complete your profile to activate your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
+            {/* Phone Number */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                Email Address
+                Phone Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
-                  <Mail size={20} />
+                  <Phone size={20} />
                 </div>
                 <input
-                  type="email"
+                  type="tel"
                   className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
-                  placeholder="Enter your email"
-                  name="email"
+                  placeholder="Enter your phone number"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  value={formData.email}
                   required
                 />
               </div>
             </motion.div>
 
-            {/* Full Name Field */}
+            {/* Date of Birth */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                Full Name
+                Date of Birth
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
+                  <Calendar size={20} />
+                </div>
+                <input
+                  type="date"
+                  className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            </motion.div>
+
+            {/* Address */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
+                  <MapPin size={20} />
+                </div>
+                <input
+                  type="text"
+                  className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
+                  placeholder="Enter your address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            </motion.div>
+
+            {/* Gender */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Gender
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
                   <User size={20} />
                 </div>
-                <input
-                  type="text"
+                <select
                   className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
-                  placeholder="Enter your full name"
-                  name="fullName"
+                  name="gender"
+                  value={formData.gender}
                   onChange={handleInputChange}
-                  value={formData.fullName}
                   required
-                />
-              </div>
-            </motion.div>
-
-            {/* Password Field */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
-                  <Lock size={20} />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 pl-10 pr-10 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all"
-                  placeholder="Create a password"
-                  name="password"
-                  onChange={handleInputChange}
-                  value={formData.password}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-blue-600 transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                  <option value="" disabled>
+                    Select your gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </motion.div>
 
+            {/* Submit Button */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
             >
               <motion.button
                 type="submit"
@@ -242,14 +283,18 @@ const SignUpPage = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Creating account...
+                    Setting up...
                   </span>
                 ) : (
-                  "Open Account"
+                  <span className="flex items-center">
+                    Complete Setup
+                    <ChevronRight size={20} className="ml-2" />
+                  </span>
                 )}
               </motion.button>
             </motion.div>
 
+            {/* Error Message */}
             {isError && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -259,28 +304,10 @@ const SignUpPage = () => {
                 {error.message}
               </motion.div>
             )}
-
-            {/* Login link */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              className="pt-2 text-gray-600 text-center"
-            >
-              <p>
-                Already have an account?{' '}
-                <Link
-                  to="/login"
-                  className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
-                >
-                  Sign In
-                </Link>
-              </p>
-            </motion.div>
           </form>
         </motion.div>
 
-        {/* Right section - Illustration */}
+        {/* Right Section - Illustration */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -369,11 +396,11 @@ const SignUpPage = () => {
 
             {/* Text overlay */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 text-transparent bg-clip-text mb-4">
-                Start Banking Smarter
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+                Your Journey Begins
               </h2>
               <p className="text-gray-600 text-lg max-w-xs">
-                Open an account with Arigo Pay for seamless payments, savings, and more.
+                Set up your account to start banking smarter with Arigo Pay.
               </p>
             </div>
           </div>
@@ -383,4 +410,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default WelcomePage;
