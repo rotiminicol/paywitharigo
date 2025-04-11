@@ -9,6 +9,7 @@ import ArigoPayLogo from "/Money.png";
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: "",
+    username: "",
     fullName: "",
     password: "",
   });
@@ -16,11 +17,11 @@ const SignUpPage = () => {
   const queryClient = useQueryClient();
 
   const { mutate, isError, isPending, error } = useMutation({
-    mutationFn: async ({ email, fullName, password }) => {
+    mutationFn: async ({ email, username, fullName, password }) => {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, fullName, password }),
+        body: JSON.stringify({ email, username, fullName, password }),
       });
 
       const data = await res.json();
@@ -154,6 +155,32 @@ const SignUpPage = () => {
                     value={formData.email}
                     required
                     autoComplete="email"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Username field */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.45 }}
+              >
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Username
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-600">
+                    <User size={20} />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="johndoe"
+                    name="username"
+                    onChange={handleInputChange}
+                    value={formData.username}
+                    required
+                    autoComplete="username"
                   />
                 </div>
               </motion.div>
