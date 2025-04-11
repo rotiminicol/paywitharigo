@@ -2,11 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-<<<<<<< HEAD
+
 import { DollarSign, CreditCard, Loader2, CheckCircle } from "lucide-react";
-=======
-import { DollarSign, BookOpen, CreditCard, Loader2, CheckCircle } from "lucide-react";
->>>>>>> 7a483a2ff38bcec8f107555b34aa4e41f5787718
+
 
 // Paystack API setup (replace with your secret key)
 const PAYSTACK_API_BASE = "https://api.paystack.co";

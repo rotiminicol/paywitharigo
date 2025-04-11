@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { DollarSign, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { DollarSign, Send, Loader2, CheckCircle, } from "lucide-react";
 
 // Paystack API base URL and secret key (replace with your own)
 const PAYSTACK_API_BASE = "https://api.paystack.co";
