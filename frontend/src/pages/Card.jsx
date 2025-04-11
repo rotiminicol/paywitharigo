@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 
 import  { useState } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> 7a483a2ff38bcec8f107555b34aa4e41f5787718
 import { CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 
 const ArigoPayCards = () => {

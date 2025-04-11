@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import  { useState } from 'react';
 import { Wallet, PiggyBank, TrendingUp, DollarSign, Calendar, Plus, Trash2 } from 'lucide-react';
 
 const Savings = () => {
   const [goal] = useState(10000);
+=======
+import React, { useState } from 'react';
+import { Wallet, PiggyBank, TrendingUp, DollarSign, Calendar, Plus, Trash2 } from 'lucide-react';
+
+const Savings = () => {
+  const [goal, setGoal] = useState(10000);
+>>>>>>> 7a483a2ff38bcec8f107555b34aa4e41f5787718
   const [current, setCurrent] = useState(2500);
   const [transactions, setTransactions] = useState([
     { id: 1, amount: 500, date: '2025-04-01', description: 'Monthly deposit' },

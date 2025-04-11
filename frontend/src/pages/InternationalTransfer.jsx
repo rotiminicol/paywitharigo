@@ -1,54 +1,98 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-<<<<<<< HEAD
-import { DollarSign, CreditCard, Loader2, CheckCircle } from "lucide-react";
-=======
-import { DollarSign, BookOpen, CreditCard, Loader2, CheckCircle } from "lucide-react";
->>>>>>> 7a483a2ff38bcec8f107555b34aa4e41f5787718
+import { DollarSign, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
-// Paystack API setup (replace with your secret key)
+// Paystack API base URL and secret key (replace with your own)
 const PAYSTACK_API_BASE = "https://api.paystack.co";
 const PAYSTACK_SECRET_KEY = "sk_test_your_paystack_secret_key"; // Replace with your Paystack secret key
 
-const initializePayment = async ({ email, amount }) => {
-  const res = await fetch(`${PAYSTACK_API_BASE}/transaction/initialize`, {
+const fetchBanks = async () => {
+  const res = await fetch(`${PAYSTACK_API_BASE}/bank?country=nigeria`, {
+    headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch banks");
+  return data.data;
+};
+
+const resolveAccount = async ({ accountNumber, bankCode }) => {
+  const res = await fetch(
+    `${PAYSTACK_API_BASE}/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
+    {
+      headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
+    }
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to resolve account");
+  return data.data;
+};
+
+const initiateTransfer = async ({ recipient, amount, reason }) => {
+  const res = await fetch(`${PAYSTACK_API_BASE}/transfer`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
+      source: "balance", // Assumes transfer from Paystack balance
       amount: amount * 100, // Paystack expects amount in kobo
-      currency: "NGN",
+      recipient,
+      reason,
     }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Failed to initialize payment");
+  if (!res.ok) throw new Error(data.message || "Failed to initiate transfer");
   return data.data;
 };
 
-const SchoolFees = () => {
+const InternationalTransfer = () => {
   const [stage, setStage] = useState("form"); // form -> confirmation -> success
+  const [banks, setBanks] = useState([]);
   const [formData, setFormData] = useState({
-    schoolType: "",
-    institution: "",
-    studentId: "",
+    bankCode: "",
+    accountNumber: "",
     amount: "",
-    email: "",
+    reason: "",
   });
-  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [accountName, setAccountName] = useState("");
+  const [transferDetails, setTransferDetails] = useState(null);
 
-  const paymentMutation = useMutation({
-    mutationFn: initializePayment,
+  // Fetch banks on mount
+  useEffect(() => {
+    const loadBanks = async () => {
+      try {
+        const bankList = await fetchBanks();
+        setBanks(bankList);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+    loadBanks();
+  }, []);
+
+  // Resolve account mutation
+  const resolveAccountMutation = useMutation({
+    mutationFn: resolveAccount,
     onSuccess: (data) => {
-      setPaymentDetails(data);
+      setAccountName(data.account_name);
+      toast.success("Account verified successfully!");
+    },
+    onError: (error) => {
+      setAccountName("");
+      toast.error(error.message);
+    },
+  });
+
+  // Initiate transfer mutation
+  const initiateTransferMutation = useMutation({
+    mutationFn: initiateTransfer,
+    onSuccess: (data) => {
+      setTransferDetails(data);
       setStage("success");
-      toast.success(`Payment of ₦${formData.amount} initiated for ${formData.institution}`);
-      // In production, redirect to data.authorization_url for Paystack checkout
-      window.location.href = data.authorization_url;
+      toast.success(`Debit Alert: ₦${formData.amount} transferred to ${accountName}`);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -58,21 +102,29 @@ const SchoolFees = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "accountNumber" || name === "bankCode") {
+      setAccountName("");
+      if (formData.bankCode && value.length === 10) {
+        resolveAccountMutation.mutate({ accountNumber: value, bankCode: formData.bankCode });
+      }
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.amount || !formData.email || !formData.institution || !formData.studentId) {
-      toast.error("Please fill all required fields.");
+    if (!accountName) {
+      toast.error("Please verify the account details first.");
       return;
     }
     setStage("confirmation");
   };
 
-  const confirmPayment = () => {
-    paymentMutation.mutate({
-      email: formData.email,
+  const confirmTransfer = () => {
+    const recipient = `${formData.bankCode}-${formData.accountNumber}`; // Simplified recipient code; use Paystack recipient API in production
+    initiateTransferMutation.mutate({
+      recipient,
       amount: parseFloat(formData.amount),
+      reason: formData.reason || "International Transfer",
     });
   };
 
@@ -86,22 +138,6 @@ const SchoolFees = () => {
     hover: { scale: 1.03, transition: { duration: 0.2 } },
     tap: { scale: 0.97 },
     disabled: { opacity: 0.7, scale: 1 },
-  };
-
-  // Nigerian school fee structure (approximate ranges)
-  const feeStructure = {
-    primary: {
-      public: "₦5,000 - ₦20,000 per term",
-      private: "₦50,000 - ₦500,000 per term",
-    },
-    secondary: {
-      public: "₦10,000 - ₦50,000 per term",
-      private: "₦100,000 - ₦3,000,000 per term",
-    },
-    tertiary: {
-      public: "₦30,000 - ₦200,000 per session",
-      private: "₦300,000 - ₦2,000,000 per session",
-    },
   };
 
   return (
@@ -135,65 +171,52 @@ const SchoolFees = () => {
               exit="exit"
             >
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Pay School Fees
+                International Transfer
               </h1>
               <p className="text-gray-600 mb-6">
-                Securely pay fees for any Nigerian school.
+                Send money securely to any Nigerian bank account.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    School Type
+                    Recipient Bank
                   </label>
                   <select
-                    name="schoolType"
-                    value={formData.schoolType}
+                    name="bankCode"
+                    value={formData.bankCode}
                     onChange={handleInputChange}
                     className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
                     required
                   >
-                    <option value="">Select school type</option>
-                    <option value="primary">Primary</option>
-                    <option value="secondary">Secondary</option>
-                    <option value="tertiary">Tertiary</option>
+                    <option value="">Select a bank</option>
+                    {banks.map((bank) => (
+                      <option key={bank.code} value={bank.code}>
+                        {bank.name}
+                      </option>
+                    ))}
                   </select>
-                  {formData.schoolType && (
-                    <p className="mt-1 text-xs text-gray-600">
-                      Typical Fees: {feeStructure[formData.schoolType].public} (Public),{" "}
-                      {feeStructure[formData.schoolType].private} (Private)
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    name="accountNumber"
+                    value={formData.accountNumber}
+                    onChange={handleInputChange}
+                    maxLength={10}
+                    className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
+                    placeholder="Enter 10-digit account number"
+                    required
+                  />
+                  {accountName && (
+                    <p className="mt-1 text-sm text-blue-600">
+                      Account Name: {accountName}
                     </p>
                   )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Institution Name
-                  </label>
-                  <input
-                    type="text"
-                    name="institution"
-                    value={formData.institution}
-                    onChange={handleInputChange}
-                    className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
-                    placeholder="e.g., Lagos State University"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Student ID
-                  </label>
-                  <input
-                    type="text"
-                    name="studentId"
-                    value={formData.studentId}
-                    onChange={handleInputChange}
-                    className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
-                    placeholder="Enter student ID"
-                    required
-                  />
                 </div>
 
                 <div>
@@ -214,28 +237,31 @@ const SchoolFees = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email
+                    Reason (Optional)
                   </label>
                   <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
+                    type="text"
+                    name="reason"
+                    value={formData.reason}
                     onChange={handleInputChange}
                     className="w-full bg-blue-50/50 border border-blue-200 text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition-all duration-300"
-                    placeholder="Enter your email"
-                    required
+                    placeholder="e.g., Payment for services"
                   />
                 </div>
 
                 <motion.button
                   type="submit"
-                  disabled={paymentMutation.isPending}
+                  disabled={resolveAccountMutation.isPending || initiateTransferMutation.isPending}
                   variants={buttonVariants}
                   whileHover="hover"
                   whileTap="tap"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-md flex items-center justify-center"
                 >
-                  <CreditCard className="w-5 h-5 mr-2" />
+                  {resolveAccountMutation.isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Send className="w-5 h-5 mr-2" />
+                  )}
                   Proceed to Confirm
                 </motion.button>
               </form>
@@ -251,27 +277,29 @@ const SchoolFees = () => {
               exit="exit"
             >
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Confirm Payment
+                Confirm Transfer
               </h1>
               <p className="text-gray-600 mb-6">
-                Review the details before completing the payment.
+                Please review the details below before proceeding.
               </p>
 
               <div className="bg-blue-50 p-4 rounded-lg mb-6">
                 <p className="text-gray-700">
-                  <span className="font-medium">School Type:</span> {formData.schoolType}
+                  <span className="font-medium">Bank:</span>{" "}
+                  {banks.find((b) => b.code === formData.bankCode)?.name}
                 </p>
                 <p className="text-gray-700">
-                  <span className="font-medium">Institution:</span> {formData.institution}
+                  <span className="font-medium">Account Number:</span> {formData.accountNumber}
                 </p>
                 <p className="text-gray-700">
-                  <span className="font-medium">Student ID:</span> {formData.studentId}
+                  <span className="font-medium">Account Name:</span> {accountName}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-medium">Amount:</span> ₦{formData.amount}
                 </p>
                 <p className="text-gray-700">
-                  <span className="font-medium">Email:</span> {formData.email}
+                  <span className="font-medium">Reason:</span>{" "}
+                  {formData.reason || "International Transfer"}
                 </p>
               </div>
 
@@ -286,19 +314,19 @@ const SchoolFees = () => {
                   Back
                 </motion.button>
                 <motion.button
-                  onClick={confirmPayment}
-                  disabled={paymentMutation.isPending}
+                  onClick={confirmTransfer}
+                  disabled={initiateTransferMutation.isPending}
                   variants={buttonVariants}
                   whileHover="hover"
                   whileTap="tap"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold flex items-center justify-center"
                 >
-                  {paymentMutation.isPending ? (
+                  {initiateTransferMutation.isPending ? (
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
                   ) : (
-                    <CreditCard className="w-5 h-5 mr-2" />
+                    <Send className="w-5 h-5 mr-2" />
                   )}
-                  Confirm Payment
+                  Confirm Transfer
                 </motion.button>
               </div>
             </motion.div>
@@ -329,13 +357,13 @@ const SchoolFees = () => {
                 transition={{ delay: 0.4 }}
               >
                 <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
-                  Payment Successful!
+                  Transfer Successful!
                 </h1>
                 <p className="text-gray-600 text-center mb-6">
-                  Your payment of ₦{formData.amount} to {formData.institution} has been initiated.
+                  Your transfer of ₦{formData.amount} to {accountName} has been completed.
                 </p>
                 <p className="text-gray-600 text-center mb-6">
-                  Reference: {paymentDetails?.reference}
+                  Transfer Code: {transferDetails?.transfer_code}
                 </p>
               </motion.div>
 
@@ -346,7 +374,7 @@ const SchoolFees = () => {
                 whileTap="tap"
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-md"
               >
-                Pay Another Fee
+                Make Another Transfer
               </motion.button>
             </motion.div>
           )}
@@ -356,4 +384,4 @@ const SchoolFees = () => {
   );
 };
 
-export default SchoolFees;
+export default InternationalTransfer;
