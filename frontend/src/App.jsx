@@ -19,8 +19,8 @@ import Search from "./pages/Search";
 import Miamour from "./pages/Miamour";
 import Verification from "./pages/Verification";
 import LandingPage from "./pages/LandingPage";
-import Messages from "./pages/Messages"
-import ForgotPasswordPage from "./pages/ForgotPasswordPage"
+import Messages from "./pages/Messages";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -55,20 +55,20 @@ function App() {
       {authUser && <Sidebar />}
       <div className="flex-1 overflow-y-auto">
         <Routes>
+          {/* Default route is now the LandingPage */}
+          <Route path="/" element={<HomePage />} />
           <Route path="/landing" element={<LandingPage />} />
-          <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
-          <Route 
-              path="/forgot-password" 
-              element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />} 
-            />
-          <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
-          <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/verification" />} />
-          <Route path="/verification" element={authUser ? <Verification /> : <Navigate to="/" />} />
+          
+          {/* Protected routes for authenticated users */}
           <Route
-            path="/notifications"
+            path="/home"
+            element={authUser ? <HomePage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/transaction-history"
             element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
           />
-           <Route
+          <Route
             path="/messages"
             element={authUser ? <Messages /> : <Navigate to="/login" />}
           />
@@ -107,6 +107,24 @@ function App() {
           <Route
             path="/miamour"
             element={authUser ? <Miamour /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/verification"
+            element={authUser ? <Verification /> : <Navigate to="/login" />}
+          />
+
+          {/* Public routes for unauthenticated users */}
+          <Route
+            path="/login"
+            element={!authUser ? <LoginPage /> : <Navigate to="/home" />}
+          />
+          <Route
+            path="/signup"
+            element={!authUser ? <SignUpPage /> : <Navigate to="/verification" />}
+          />
+          <Route
+            path="/forgot-password"
+            element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/home" />}
           />
         </Routes>
       </div>

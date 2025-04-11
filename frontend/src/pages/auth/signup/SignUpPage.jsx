@@ -6,6 +6,7 @@ import { FaUser } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { MdOutlineRemoveRedEye, MdOutlineVisibilityOff } from "react-icons/md";
+import IjeuwaLogo from "/ijuewa.png";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -77,9 +78,7 @@ const SignUpPage = () => {
           className="flex justify-center mb-8 md:hidden"
         >
           <div className="flex items-center space-x-2">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-green-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">IJ</span>
-            </div>
+          <img src={IjeuwaLogo} alt="iJeuwa Logo" className="h-10 w-10" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text">
               iJeuwa
             </span>
@@ -100,9 +99,7 @@ const SignUpPage = () => {
             transition={{ duration: 0.5 }}
             className="hidden md:flex items-center space-x-2 mb-8"
           >
-            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-green-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">IJ</span>
-            </div>
+            <img src={IjeuwaLogo} alt="iJeuwa Logo" className="h-10 w-10" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-green-300 text-transparent bg-clip-text">
               iJeuwa
             </span>

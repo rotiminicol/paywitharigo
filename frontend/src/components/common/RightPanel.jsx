@@ -1,481 +1,414 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import useFollow from "../../hooks/useFollow";
-import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
-import LoadingSpinner from "./LoadingSpinner";
-import { FiUsers, FiUserPlus, FiUserCheck, FiHash, FiTrendingUp, FiStar, FiInfo } from "react-icons/fi";
+import { FiDollarSign, FiTrendingUp, FiPieChart, FiCreditCard, FiShield, FiRefreshCw, FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
+import { SiBitcoin, SiEthereum } from "react-icons/si";
+import { FaEuroSign, FaPoundSign, FaYenSign } from "react-icons/fa";
 
 const RightPanel = () => {
-  const [activeTab, setActiveTab] = useState("suggested");
-  const [animateBackground, setAnimateBackground] = useState(true);
+  const [activeTab, setActiveTab] = useState("rates");
+  const [lastUpdated, setLastUpdated] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Mock data
+  const exchangeRates = [
+    { currency: "USD", symbol: <FiDollarSign />, rate: 1.00, change: 0.00 },
+    { currency: "EUR", symbol: <FaEuroSign />, rate: 0.92, change: -0.12 },
+    { currency: "GBP", symbol: <FaPoundSign />, rate: 0.79, change: 0.05 },
+    { currency: "JPY", symbol: <FaYenSign />, rate: 151.23, change: 0.34 },
+  ];
+
+  const cryptoRates = [
+    { name: "Bitcoin", symbol: "BTC", icon: <SiBitcoin className="text-orange-500" />, price: 63452.78, change: 2.45 },
+    { name: "Ethereum", symbol: "ETH", icon: <SiEthereum className="text-purple-500" />, price: 3456.21, change: -1.23 },
+  ];
+
+  const recentTransactions = [
+    { id: 1, description: "Grocery Store", amount: -85.23, date: "10:45 AM", category: "Food" },
+    { id: 2, description: "Salary Deposit", amount: 3250.00, date: "Apr 1", category: "Income" },
+    { id: 3, description: "Electric Bill", amount: -120.75, date: "Mar 29", category: "Utilities" },
+  ];
+
+  const financialTips = [
+    "Set aside 20% of income for savings",
+    "Review your monthly subscriptions",
+    "Consider diversifying investments",
+  ];
 
   useEffect(() => {
-    const interval = setInterval(() => setAnimateBackground(prev => !prev), 15000); // Faster animation switch
-    return () => clearInterval(interval);
-  }, []);
+    const now = new Date();
+    setLastUpdated(now.toLocaleTimeString());
+  }, [refreshing]);
 
-  const { data: suggestedUsers, isLoading: isSuggestedLoading } = useQuery({
-    queryKey: ["suggestedUsers"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/users/suggested");
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Something went wrong!");
-        return data;
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-  });
-
-  const { data: mutualFriends, isLoading: isMutualLoading } = useQuery({
-    queryKey: ["mutualFriends"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/users/mutual");
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Something went wrong!");
-        return data;
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-    enabled: activeTab === "mutual",
-  });
-
-  const { data: trendingTopics, isLoading: isTrendingLoading } = useQuery({
-    queryKey: ["trendingTopics"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/trends");
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Something went wrong!");
-        return data.slice(0, 8);
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-  });
-
-  const { data: featuredUsers, isLoading: isFeaturedLoading } = useQuery({
-    queryKey: ["featuredUsers"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/users/featured");
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Something went wrong!");
-        return data.slice(0, 3);
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-  });
-
-  const { follow, isPending } = useFollow();
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      const now = new Date();
+      setLastUpdated(now.toLocaleTimeString());
+      setRefreshing(false);
+    }, 1000);
+  };
 
   const containerVariants = {
-    hidden: { opacity: 0, x: 20 },
+    hidden: { opacity: 0 },
     visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: { duration: 0.7, staggerChildren: 0.15 }
+      opacity: 1,
+      transition: { 
+        duration: 0.3,
+        staggerChildren: 0.1,
+        when: "beforeChildren"
+      }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 150 } }
-  };
-
-  const trendingVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: (custom) => ({ 
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
       opacity: 1, 
-      scale: 1, 
+      y: 0,
       transition: { 
-        delay: custom * 0.1,
         type: "spring", 
-        stiffness: 200 
-      } 
-    })
-  };
-
-  const backgroundVariants = {
-    pattern1: {
-      scale: [1, 1.3, 1.1, 1.4, 1],
-      rotate: [0, 15, -15, 10, 0],
-      opacity: [0.2, 0.4, 0.3, 0.5, 0.2],
-      transition: { duration: 10, repeat: Infinity, ease: "easeInOut" }
-    },
-    pattern2: {
-      scale: [1.3, 1, 1.4, 0.9, 1.3],
-      rotate: [0, -20, 15, -10, 0],
-      opacity: [0.3, 0.5, 0.2, 0.4, 0.3],
-      transition: { duration: 8, repeat: Infinity, ease: "easeInOut" }
+        stiffness: 100,
+        damping: 10
+      }
     }
   };
 
-  const currentData = activeTab === "suggested" ? suggestedUsers : mutualFriends;
-  const isLoading = activeTab === "suggested" ? isSuggestedLoading : isMutualLoading;
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.98 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 80
+      }
+    }
+  };
 
   return (
     <motion.div 
+      className="hidden lg:flex flex-col w-96 h-[calc(100vh-1rem)] my-2 mx-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="hidden lg:block my-2 mx-1 w-96 h-[calc(100vh-0.5rem)] overflow-hidden bg-black/90 border-2 border-gradient-to-r from-green-600 via-purple-600 to-green-600 rounded-2xl shadow-2xl shadow-purple-500/30"
     >
-      <div id="right-panel-container" className="h-full flex flex-col relative overflow-y-auto scrollbar-hide">
-        {/* Vibrant Animated Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            className="absolute top-0 -left-20 w-64 h-64 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full blur-3xl"
-            animate={animateBackground ? "pattern1" : "pattern2"}
-            variants={backgroundVariants}
-          />
-          <motion.div 
-            className="absolute bottom-20 -right-20 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full blur-3xl"
-            animate={animateBackground ? "pattern2" : "pattern1"}
-            variants={backgroundVariants}
-          />
-          <motion.div 
-            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-2xl"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 360, 0],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-
-        {/* Header */}
-        <motion.div 
-          className="p-5 border-b border-purple-600/50 bg-gradient-to-b from-black/80 to-transparent"
-          whileHover={{ boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" }}
-        >
-          <motion.h2 
-            className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-white to-purple-400"
-            animate={{ 
-              backgroundPosition: ["0% 50%", "100% 50%"],
-              textShadow: ["0 0 10px rgba(34, 197, 94, 0.5)", "0 0 20px rgba(147, 51, 234, 0.5)", "0 0 10px rgba(34, 197, 94, 0.5)"]
-            }}
-            transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
-          >
-            Connect & Discover
-          </motion.h2>
-          <motion.p
-            className="text-sm text-white/80 mt-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            Vibrant connections await!
-          </motion.p>
-        </motion.div>
-
-        {/* Tabs */}
-        <div className="px-4 py-3 border-b border-purple-600/50">
-          <div className="flex gap-3">
-            {[
-              { id: "suggested", label: "Suggested", icon: <FiUserPlus /> },
-              { id: "mutual", label: "Mutual", icon: <FiUserCheck /> }
-            ].map((tab) => (
-              <motion.button
-                key={tab.id}
-                className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl text-sm font-semibold ${
-                  activeTab === tab.id 
-                    ? "bg-gradient-to-r from-green-600 via-white/20 to-purple-600 text-white shadow-lg shadow-green-500/30" 
-                    : "text-white/70 bg-black/50 hover:bg-green-900/30"
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-                whileHover={{ scale: 1.05, y: -3, boxShadow: "0 0 15px rgba(34, 197, 94, 0.5)" }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 500, damping: 15 }}
-              >
-                <motion.span
-                  animate={activeTab === tab.id ? { rotate: [0, 360], scale: [1, 1.2, 1] } : { scale: 1 }}
-                  transition={{ duration: 1.5, repeat: activeTab === tab.id ? Infinity : 0 }}
-                >
-                  {tab.icon}
-                </motion.span> 
-                {tab.label}
-              </motion.button>
-            ))}
+      {/* Header */}
+      <motion.div 
+        className="p-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white"
+        variants={itemVariants}
+      >
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-2xl font-bold">Financial Insights</h2>
+            <p className="text-sm opacity-90 mt-1">Real-time market data</p>
           </div>
+          <motion.button
+            onClick={handleRefresh}
+            whileHover={{ rotate: 180 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            disabled={refreshing}
+          >
+            <FiRefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
+          </motion.button>
         </div>
+        <motion.p 
+          className="text-xs mt-3 opacity-80"
+          animate={{ opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          Last updated: {lastUpdated}
+        </motion.p>
+      </motion.div>
 
-        {/* Featured Users Section */}
-        {featuredUsers && featuredUsers.length > 0 && (
-          <div className="px-4 py-4 border-b border-purple-600/50">
-            <motion.h3 
-              className="text-lg font-bold text-white mb-3 flex items-center gap-2"
+      {/* Tabs */}
+      <motion.div 
+        className="flex border-b border-gray-200 bg-gray-50"
+        variants={itemVariants}
+      >
+        {[
+          { id: "rates", label: "Exchange Rates", icon: <FiDollarSign /> },
+          { id: "crypto", label: "Crypto", icon: <FiTrendingUp /> },
+          { id: "transactions", label: "Transactions", icon: <FiCreditCard /> }
+        ].map((tab) => (
+          <motion.button
+            key={tab.id}
+            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+              activeTab === tab.id 
+                ? "text-blue-600 border-b-2 border-blue-600 bg-white" 
+                : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab(tab.id)}
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            variants={itemVariants}
+          >
+            {tab.icon}
+            {tab.label}
+          </motion.button>
+        ))}
+      </motion.div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* Exchange Rates Tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === "rates" && (
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-5"
             >
-              <FiStar className="text-green-400 animate-pulse" /> Featured Stars
-            </motion.h3>
-            <motion.div 
-              className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide"
-              variants={containerVariants}
-            >
-              {isFeaturedLoading ? (
-                <div className="flex-1 flex justify-center items-center">
-                  <LoadingSpinner />
-                </div>
-              ) : (
-                featuredUsers.map((user) => (
-                  <motion.div
-                    key={user._id}
-                    variants={itemVariants}
-                    whileHover={{ y: -8, scale: 1.05, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" }}
-                    className="flex-shrink-0 w-28"
-                  >
-                    <Link to={`/profile/${user.username}`} className="block">
-                      <div className="relative group">
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-green-500 via-white/20 to-purple-600 p-0.5 group-hover:shadow-[0_0_25px_rgba(34,197,94,0.7)] transition-all duration-500">
-                          <div className="w-full h-full rounded-2xl bg-black/80 backdrop-blur-sm"></div>
-                        </div>
-                        <div className="relative flex flex-col items-center p-3">
-                          <motion.div 
-                            className="w-14 h-14 rounded-full border-2 border-green-400 mb-2 overflow-hidden relative"
-                            whileHover={{ scale: 1.15, rotate: 360 }}
-                            transition={{ duration: 0.7 }}
-                          >
-                            <img 
-                              src={user.profileImg || "/avatar-placeholder.png"}
-                              alt={user.username}
-                              className="w-full h-full object-cover"
-                            />
-                            <motion.div 
-                              className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100"
-                              transition={{ duration: 0.5 }}
-                            />
-                          </motion.div>
-                          <p className="text-sm font-bold text-white text-center truncate w-full group-hover:text-green-300 transition-colors duration-500">
-                            {user.fullName}
-                          </p>
-                          <p className="text-xs text-purple-400 text-center truncate w-full group-hover:text-white transition-colors duration-500">
-                            @{user.username}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))
-              )}
-            </motion.div>
-          </div>
-        )}
-
-        {/* Users Section */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide">
-          <motion.div className="flex flex-col gap-4" variants={containerVariants}>
-            {isLoading ? (
-              <RightPanelSkeleton />
-            ) : currentData?.length > 0 ? (
-              <AnimatePresence mode="popLayout">
-                {currentData.map((user) => (
-                  <motion.div
-                    key={user._id}
-                    variants={itemVariants}
-                    className="group relative overflow-hidden rounded-2xl border border-purple-600/30"
-                    whileHover={{ 
-                      scale: 1.03,
-                      boxShadow: "0 0 25px rgba(34, 197, 94, 0.5)" 
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 via-white/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl"></div>
-                    <Link 
-                      to={`/profile/${user.username}`} 
-                      className="flex items-center justify-between gap-3 p-4 hover:bg-green-900/30 transition-all duration-500"
-                    >
-                      <div className="flex gap-3 items-center">
-                        <div className="relative w-12 h-12 flex-shrink-0 group-hover:scale-110 transition-all duration-500">
-                          <motion.div 
-                            className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500 via-white/20 to-purple-600 opacity-80 group-hover:opacity-100 transition-all duration-500"
-                            animate={{ rotate: [0, 360] }}
-                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                          ></motion.div>
-                          <img 
-                            src={user.profileImg || "/avatar-placeholder.png"} 
-                            alt={user.username}
-                            className="relative w-full h-full rounded-full object-cover border-2 border-green-400 group-hover:border-white transition-all duration-500"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <motion.p 
-                            className="text-sm font-bold text-white line-clamp-1 group-hover:text-green-300 transition-colors duration-500"
-                            whileHover={{ x: 5 }}
-                          >
-                            {user.fullName}
-                          </motion.p>
-                          <p className="text-xs text-gray-300 group-hover:text-purple-300 transition-colors duration-500 truncate">
-                            @{user.username}
-                          </p>
-                          {user.bio && (
-                            <p className="text-xs text-gray-400 line-clamp-1 mt-1 group-hover:text-white transition-colors duration-500">
-                              {user.bio}
-                            </p>
-                          )}
-                          {activeTab === "mutual" && user.mutualCount && (
-                            <span className="text-xs text-green-400 flex items-center gap-1 mt-1 group-hover:text-white transition-colors duration-500">
-                              <FiUsers size={12} /> {user.mutualCount} mutual
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.15, y: -3, boxShadow: "0 0 15px rgba(147, 51, 234, 0.7)" }}
-                        whileTap={{ scale: 0.95 }}
-                        className="bg-gradient-to-r from-green-600 via-white/20 to-purple-600 text-white rounded-full py-1.5 px-4 text-sm font-semibold"
-                        onClick={(e) => { e.preventDefault(); follow(user._id); }}
-                        disabled={isPending}
-                      >
-                        {isPending ? <LoadingSpinner size="sm" /> : "Follow"}
-                      </motion.button>
-                    </Link>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            ) : (
-              <motion.div 
-                className="text-center p-8 text-white/70 bg-gradient-to-b from-black/50 to-purple-900/20 rounded-2xl"
+              <motion.h3 
+                className="text-lg font-semibold text-gray-800 flex items-center gap-2"
                 variants={itemVariants}
               >
-                <motion.div 
-                  className="inline-block mb-3"
-                  animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
-                  {activeTab === "suggested" ? <FiUserPlus size={32} className="text-green-400" /> : <FiUserCheck size={32} className="text-purple-400" />}
-                </motion.div>
-                <p className="text-sm">No {activeTab === "suggested" ? "suggestions" : "mutual friends"} yet</p>
-              </motion.div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* Trending Topics Section */}
-        <div className="px-4 py-4 border-t border-purple-600/50 bg-gradient-to-t from-black/80 to-transparent">
-          <motion.h3 
-            className="text-lg font-bold text-white mb-4 flex items-center gap-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <FiTrendingUp className="text-purple-400 animate-bounce" /> Trending Now
-          </motion.h3>
-          <motion.div className="grid grid-cols-2 gap-3">
-            {isTrendingLoading ? (
-              <RightPanelSkeleton />
-            ) : trendingTopics?.length > 0 ? (
-              trendingTopics.map((topic, index) => (
-                <motion.div
-                  key={topic._id || index}
-                  custom={index}
-                  variants={trendingVariants}
-                  initial="hidden"
-                  animate="visible"
-                  whileHover={{ 
-                    y: -5, 
-                    scale: 1.05,
-                    boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)"
-                  }}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-900/30 to-green-900/30 transition-all duration-500"
-                >
-                  <div className="p-3">
-                    <div className="flex items-center gap-2">
-                      <motion.div 
-                        className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 via-white/20 to-purple-600 flex items-center justify-center group-hover:scale-115 transition-all duration-500"
-                        animate={{ rotate: [0, 360] }}
-                        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                      >
-                        <FiHash className="text-white" size={16} />
-                      </motion.div>
-                      <div className="min-w-0">
-                        <motion.span 
-                          className="text-sm font-semibold text-white group-hover:text-green-300 transition-colors duration-500 block truncate"
-                          whileHover={{ x: 3 }}
-                        >
-                          {topic.name}
-                        </motion.span>
-                        <span className="text-xs text-gray-300 block group-hover:text-white transition-colors duration-500">
-                          {topic.postCount} posts
-                        </span>
+                <FiDollarSign className="text-blue-500" />
+                Currency Exchange Rates
+              </motion.h3>
+              
+              <motion.div 
+                className="space-y-3"
+                variants={containerVariants}
+              >
+                {exchangeRates.map((rate, ) => (
+                  <motion.div
+                    key={rate.currency}
+                    variants={cardVariants}
+                    className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all"
+                    whileHover={{ y: -2 }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-blue-50 text-blue-600">
+                          {rate.symbol}
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{rate.currency}</h4>
+                          <p className="text-xs text-gray-500">1 USD = {rate.rate} {rate.currency}</p>
+                        </div>
+                      </div>
+                      <div className={`text-sm font-medium ${
+                        rate.change >= 0 ? "text-green-500" : "text-red-500"
+                      }`}>
+                        {rate.change >= 0 ? (
+                          <span className="flex items-center">
+                            <FiArrowUpRight className="mr-1" /> {Math.abs(rate.change)}%
+                          </span>
+                        ) : (
+                          <span className="flex items-center">
+                            <FiArrowDownRight className="mr-1" /> {Math.abs(rate.change)}%
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <motion.div 
-                    className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-green-500 via-white to-purple-500"
-                    initial={{ width: 0 }}
-                    whileHover={{ width: "100%" }}
-                    transition={{ duration: 0.5 }}
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                variants={itemVariants}
+                className="bg-blue-50 p-4 rounded-lg border border-blue-100"
+              >
+                <h4 className="font-medium text-blue-800 flex items-center gap-2 mb-3">
+                  <FiPieChart /> Currency Converter
+                </h4>
+                <div className="grid grid-cols-5 gap-2 items-center">
+                  <input 
+                    type="number" 
+                    className="col-span-2 p-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all"
+                    placeholder="Amount"
+                    defaultValue="100"
                   />
-                </motion.div>
-              ))
-            ) : (
-              <motion.div 
-                className="text-center p-4 text-white/70 bg-gradient-to-b from-black/50 to-purple-900/20 rounded-2xl col-span-2"
+                  <select className="col-span-2 p-2 border border-gray-300 rounded-md text-sm bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all">
+                    <option>USD</option>
+                    <option>EUR</option>
+                    <option>GBP</option>
+                    <option>JPY</option>
+                  </select>
+                  <motion.button 
+                    className="col-span-1 p-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Convert
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Crypto Tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === "crypto" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-5"
+            >
+              <motion.h3 
+                className="text-lg font-semibold text-gray-800 flex items-center gap-2"
                 variants={itemVariants}
               >
-                <motion.div 
-                  className="inline-block mb-2"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <FiTrendingUp size={32} className="text-green-400" />
-                </motion.div>
-                <p className="text-sm">No trends yet</p>
-              </motion.div>
-            )}
-          </motion.div>
-          {trendingTopics?.length > 0 && (
-            <motion.button
-              whileHover={{ scale: 1.05, y: -3, boxShadow: "0 0 20px rgba(34, 197, 94, 0.5)" }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full mt-4 p-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-purple-600 hover:bg-gradient-to-r hover:from-green-500 hover:to-purple-500 transition-all duration-500"
-            >
-              Explore More Trends
-            </motion.button>
-          )}
-        </div>
-
-        {/* Footer */}
-        <motion.div 
-          className="p-4 border-t border-purple-600/50 bg-gradient-to-t from-black/80 to-transparent"
-          whileHover={{ boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" }}
-        >
-          <div className="flex flex-wrap gap-3 text-sm text-white/70 justify-center mb-3">
-            {["Terms", "Privacy", "Cookies", "About", "Help", "Settings"].map((item, idx) => (
-              <motion.a
-                key={item}
-                href="#"
-                className="hover:text-green-300 transition-colors duration-500"
-                whileHover={{ scale: 1.1, y: -3 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 * idx }}
+                <FiTrendingUp className="text-blue-500" />
+                Cryptocurrency Prices
+              </motion.h3>
+              
+              <motion.div 
+                className="space-y-3"
+                variants={containerVariants}
               >
-                {item}
-              </motion.a>
-            ))}
-          </div>
-          <motion.div 
-            className="text-xs text-white/60 text-center flex items-center justify-center gap-1"
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <FiInfo size={14} className="text-purple-400" /> 
-            <p>
-              © {new Date().getFullYear()} Miamour • Powered by Passion
-            </p>
-          </motion.div>
-        </motion.div>
+                {cryptoRates.map((crypto, ) => (
+                  <motion.div
+                    key={crypto.symbol}
+                    variants={cardVariants}
+                    className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all"
+                    whileHover={{ y: -2 }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-gray-50">
+                          {crypto.icon}
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{crypto.name}</h4>
+                          <p className="text-xs text-gray-500">{crypto.symbol}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${crypto.price.toLocaleString()}</p>
+                        <p className={`text-xs font-medium ${
+                          crypto.change >= 0 ? "text-green-500" : "text-red-500"
+                        }`}>
+                          {crypto.change >= 0 ? '+' : ''}{crypto.change}%
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                variants={itemVariants}
+                className="bg-blue-50 p-4 rounded-lg border border-blue-100"
+              >
+                <h4 className="font-medium text-blue-800 flex items-center gap-2 mb-3">
+                  <FiShield /> Crypto Safety Tips
+                </h4>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <motion.li 
+                    className="flex items-start gap-2"
+                    whileHover={{ x: 2 }}
+                  >
+                    <span className="text-blue-500">•</span> Only use reputable exchanges
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-start gap-2"
+                    whileHover={{ x: 2 }}
+                  >
+                    <span className="text-blue-500">•</span> Enable two-factor authentication
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-start gap-2"
+                    whileHover={{ x: 2 }}
+                  >
+                    <span className="text-blue-500">•</span> Consider cold storage for large amounts
+                  </motion.li>
+                </ul>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Transactions Tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === "transactions" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-5"
+            >
+              <motion.h3 
+                className="text-lg font-semibold text-gray-800 flex items-center gap-2"
+                variants={itemVariants}
+              >
+                <FiCreditCard className="text-blue-500" />
+                Recent Transactions
+              </motion.h3>
+              
+              <motion.div 
+                className="space-y-3"
+                variants={containerVariants}
+              >
+                {recentTransactions.map((txn, ) => (
+                  <motion.div
+                    key={txn.id}
+                    variants={cardVariants}
+                    className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all"
+                    whileHover={{ y: -2 }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-900">{txn.description}</h4>
+                        <p className="text-xs text-gray-500">{txn.date} • {txn.category}</p>
+                      </div>
+                      <p className={`font-medium ${
+                        txn.amount >= 0 ? "text-green-600" : "text-red-600"
+                      }`}>
+                        {txn.amount >= 0 ? '+' : ''}{txn.amount.toFixed(2)}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                variants={itemVariants}
+                className="bg-blue-50 p-4 rounded-lg border border-blue-100"
+              >
+                <h4 className="font-medium text-blue-800 flex items-center gap-2 mb-3">
+                  <FiPieChart /> Financial Tips
+                </h4>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  {financialTips.map((tip, index) => (
+                    <motion.li 
+                      key={index}
+                      className="flex items-start gap-2"
+                      whileHover={{ x: 2 }}
+                    >
+                      <span className="text-blue-500">•</span> {tip}
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* Footer */}
+      <motion.div 
+        className="p-4 border-t border-gray-200 bg-gray-50 text-center"
+        variants={itemVariants}
+      >
+        <p className="text-xs text-gray-500">
+          Data provided by Arigo Bank • Rates may vary
+        </p>
+        <motion.p 
+          className="text-xs text-blue-600 mt-1"
+          animate={{ opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          Secure banking with 256-bit encryption
+        </motion.p>
+      </motion.div>
     </motion.div>
   );
 };

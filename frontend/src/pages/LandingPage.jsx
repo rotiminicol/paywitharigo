@@ -1,308 +1,378 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Users, MessageSquare, Sparkles,  Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Menu, X,CreditCard,Lock,Smartphone,User } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import ArigoPayLogo from "/ijuewa.png"
 
 const LandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.5]);
+  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+
   useEffect(() => {
     setIsVisible(true);
+    document.body.style.scrollBehavior = 'smooth';
   }, []);
 
+  // Animation Variants
+  const navVariants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 120, damping: 20 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 100 } },
+  };
+
+  // Custom Animation for Hero
+  const heroAnimation = {
+    animate: { rotate: [0, 360], scale: [1, 1.1, 1] },
+    transition: { duration: 10, repeat: Infinity, ease: 'linear' },
+  };
+
+
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 text-gray-900 overflow-x-hidden">
       {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="px-6 py-4 flex justify-between items-center sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm border-b border-gray-800"
+      <motion.nav
+        variants={navVariants}
+        initial="hidden"
+        animate="visible"
+        className="px-6 py-4 flex justify-between items-center sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200 will-change-transform"
       >
         <div className="flex items-center space-x-2">
-          <motion.div 
-            whileHover={{ rotate: 15, scale: 1.1 }}
-            className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center"
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center"
           >
-            <Sparkles size={18} className="text-white" />
+            <img src={ArigoPayLogo} alt="Arigo Pay Logo" />
           </motion.div>
-          <span className="text-xl font-bold bg-gradient-to-r from-purple-500 to-green-400 text-transparent bg-clip-text">Ijeuwa</span>
+          <span className="text-xl font-semibold text-blue-700">Arigo Pay</span>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
-          <motion.a 
-            whileHover={{ y: -2 }}
-            href="#features" 
-            className="hover:text-purple-400 transition-colors"
-          >
-            Features
+          <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="#services">
+            Services
           </motion.a>
-          <motion.a 
-            whileHover={{ y: -2 }}
-            href="#testimonials" 
-            className="hover:text-purple-400 transition-colors"
-          >
-            Testimonials
+          <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="#about">
+            About Us
           </motion.a>
-          <motion.a 
-            whileHover={{ y: -2 }}
-            href="#pricing" 
-            className="hover:text-purple-400 transition-colors"
-          >
-            Pricing
+          <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="#rates">
+            Rates
           </motion.a>
           <motion.a
             href="/login"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 0 10px rgba(29, 78, 216, 0.3)' }}
             whileTap={{ scale: 0.95 }}
-            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-green-500 rounded-full transition-all shadow-lg hover:shadow-purple-500/30"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition-colors"
           >
-            Sign In
+            Log In
           </motion.a>
         </div>
-        <button 
-          className="md:hidden p-2"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
+        <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-
+  
         {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden absolute top-16 right-6 bg-gray-900 border border-gray-800 rounded-lg shadow-xl p-4 z-50"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3, type: 'spring' }}
+              className="md:hidden absolute top-16 right-6 bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-50"
             >
               <div className="flex flex-col space-y-4">
-                <a href="#features" className="hover:text-purple-400 transition-colors">Features</a>
-                <a href="#testimonials" className="hover:text-purple-400 transition-colors">Testimonials</a>
-                <a href="#pricing" className="hover:text-purple-400 transition-colors">Pricing</a>
-                <a href="/signin" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-full text-center transition-colors">
-                  Sign In
+                <a href="#services" className="hover:text-blue-600 transition-colors">
+                  Services
+                </a>
+                <a href="#about" className="hover:text-blue-600 transition-colors">
+                  About Us
+                </a>
+                <a href="#rates" className="hover:text-blue-600 transition-colors">
+                  Rates
+                </a>
+                <a
+                  href="/login"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-center hover:bg-blue-700 transition-colors"
+                >
+                  Log In
                 </a>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.nav>
-
+  
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 px-6 max-w-6xl mx-auto">
-        <div className={`absolute top-20 -left-10 h-64 w-64 bg-purple-600 rounded-full filter blur-3xl opacity-20 ${isVisible ? 'animate-pulse' : 'opacity-0'}`}></div>
-        <div className={`absolute bottom-10 right-10 h-64 w-64 bg-green-500 rounded-full filter blur-3xl opacity-20 ${isVisible ? 'animate-pulse' : 'opacity-0'}`}></div>
-        
+      <motion.section
+        style={{ opacity: heroOpacity, scale: heroScale }}
+        className="relative pt-20 pb-32 px-6 max-w-6xl mx-auto"
+      >
+        <div
+          className={`absolute top-20 -left-10 h-64 w-64 bg-blue-200 rounded-full filter blur-3xl opacity-10 ${
+            isVisible ? 'animate-pulse' : 'opacity-0'
+          }`}
+        ></div>
+        <div
+          className={`absolute bottom-10 right-10 h-64 w-64 bg-blue-300 rounded-full filter blur-3xl opacity-10 ${
+            isVisible ? 'animate-pulse' : 'opacity-0'
+          }`}
+        ></div>
+  
         <div className="flex flex-col md:flex-row items-center">
-          <motion.div 
-            initial={{ x: -50, opacity: 0 }}
-            animate={isVisible ? { x: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate={isVisible ? 'visible' : 'hidden'}
             className="md:w-1/2 space-y-6"
           >
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              Connect, Share, <span className="bg-gradient-to-r from-purple-500 to-green-400 text-transparent bg-clip-text">Thrive</span>
+              Secure Banking,{' '}
+              <span className="text-blue-600">Simplified</span>
             </h1>
-            <p className="text-lg text-gray-300 max-w-md">
-              A social platform designed for authentic connections and meaningful interactions. Join our community today.
+            <p className="text-lg text-gray-600 max-w-md">
+              Manage your finances with confidence using Arigo Pay’s secure, user-friendly platform. Start today.
             </p>
             <div className="flex space-x-4 pt-4">
               <motion.a
                 href="/signup"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(29, 78, 216, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-green-500 rounded-md flex items-center space-x-2 transition-all shadow-lg hover:shadow-purple-500/30"
+                className="px-6 py-3 bg-blue-600 text-white rounded-md flex items-center space-x-2 shadow-md hover:bg-blue-700"
               >
-                <span>Get Started</span>
+                <span>Open an Account</span>
                 <ArrowRight size={18} />
               </motion.a>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
+              <motion.button
+                whileHover={{ scale: 1.05, backgroundColor: '#eff6ff', borderColor: '#1d4ed8' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 border border-green-500 text-green-500 rounded-md hover:bg-green-500 hover:text-black transition-all"
+                className="px-6 py-3 border border-blue-600 text-blue-600 rounded-md hover:text-blue-700 transition-all"
               >
-                Learn More
+                Explore Services
               </motion.button>
             </div>
           </motion.div>
-          
-          <motion.div 
-            initial={{ y: 50, opacity: 0 }}
-            animate={isVisible ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="md:w-1/2"
+  
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate={isVisible ? 'visible' : 'hidden'}
+            transition={{ delay: 0.3 }}
+            className="md:w-1/2 mt-10 md:mt-0"
           >
-            <div className="relative w-full h-96 ml-auto">
-              <motion.div 
-                animate={{
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                className="absolute top-8 right-8 w-64 h-64 bg-purple-800 rounded-xl opacity-60"
-              ></motion.div>
-              <div className="absolute top-12 right-12 w-64 h-64 bg-black border-2 border-green-400 rounded-xl overflow-hidden">
-                <div className="h-full w-full bg-black p-4 flex flex-col">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <div className="h-8 w-8 rounded-full bg-green-500"></div>
-                    <span className="text-sm font-medium">@username</span>
-                  </div>
-                  <div className="flex-1 bg-purple-900 bg-opacity-30 rounded-lg p-3 text-sm">
-                    Just shared my latest project! Check it out and let me know what you think. #innovation #creativity
-                  </div>
-                  <div className="flex justify-between mt-3 text-xs text-gray-400">
-                    <span className="flex items-center">
-                      <MessageSquare size={12} className="mr-1" /> 24
-                    </span>
-                    <span className="flex items-center">
-                      <Users size={12} className="mr-1" /> 142
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <motion.div 
-                animate={{
-                  y: [0, 10, 0],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="absolute top-24 right-24 w-64 h-64 bg-black border-2 border-purple-400 rounded-xl"
-              ></motion.div>
+            <div className="relative w-full h-96">
+              <motion.div
+                {...heroAnimation}
+                className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-300 rounded-xl opacity-20"
+              />
+              <motion.div
+                animate={{ y: [-20, 20, -20], rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute top-10 left-10 w-48 h-48 bg-white border-2 border-blue-400 rounded-lg flex items-center justify-center shadow-md"
+              >
+                <CreditCard size={64} className="text-blue-600" />
+              </motion.div>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute bottom-10 right-10 w-32 h-32 bg-blue-200 rounded-full opacity-50"
+              />
             </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-20 bg-gray-900 px-6">
+      </motion.section>
+  
+      {/* Services */}
+      <section id="services" className="py-20 bg-white px-6">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <motion.h2
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="text-3xl font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-16 text-gray-900"
           >
-            <span className="bg-gradient-to-r from-purple-500 to-green-400 text-transparent bg-clip-text">Why Choose Us</span>
+            Why Bank with Arigo Pay
           </motion.h2>
-          
+  
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                icon: <Users className="h-8 w-8 text-purple-500" />,
-                title: "Community Focus",
-                description: "Build genuine connections with like-minded individuals in a safe, inclusive environment."
+                icon: <Lock className="h-8 w-8 text-blue-600" />,
+                title: 'Secure Transactions',
+                description: 'Your funds are protected with industry-leading encryption and fraud detection.',
               },
               {
-                icon: <Sparkles className="h-8 w-8 text-green-500" />,
-                title: "Creator Tools",
-                description: "Express yourself with our powerful creative tools designed for maximum engagement."
+                icon: <CreditCard className="h-8 w-8 text-blue-600" />,
+                title: 'Flexible Accounts',
+                description: 'Choose from a range of accounts tailored to your personal or business needs.',
               },
               {
-                icon: <MessageSquare className="h-8 w-8 text-purple-500" />,
-                title: "Meaningful Conversations",
-                description: "Our platform promotes quality interactions over quantity for deeper relationships."
-              }
-            ].map((feature, index) => (
-              <motion.div 
+                icon: <Smartphone className="h-8 w-8 text-blue-600" />,
+                title: 'Mobile Banking',
+                description: 'Manage your money anytime, anywhere with our intuitive mobile app.',
+              },
+            ].map((service, index) => (
+              <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
-                className="bg-black p-6 rounded-xl border border-gray-800 hover:border-purple-500 transition-all duration-300 hover:-translate-y-2"
+                transition={{ delay: index * 0.2 }}
+                className="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-blue-400 transition-all duration-300 hover:-translate-y-2 will-change-transform"
               >
-                <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="mb-4"
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="mb-4 flex justify-center"
                 >
-                  {feature.icon}
+                  {service.icon}
                 </motion.div>
-                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                <p className="text-gray-400">{feature.description}</p>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    borderColor: ['#1d4ed8', '#60a5fa', '#1d4ed8'],
+                  }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                  className="w-full h-32 border-2 border-blue-400 rounded-md mb-4 flex items-center justify-center"
+                >
+                  <motion.div
+                    animate={{ y: [-10, 10, -10] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    {service.icon}
+                  </motion.div>
+                </motion.div>
+                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                <p className="text-gray-600">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-
+  
+      {/* Testimonials */}
+      <section id="about" className="py-20 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <motion.h2
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-3xl font-bold text-center mb-16 text-gray-900"
+          >
+            Trusted by Our Customers
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                name: 'Sarah Johnson',
+                text: 'Arigo Pay makes managing my finances so easy and secure. I trust them completely!',
+              },
+              {
+                name: 'Michael Lee',
+                text: 'Their mobile app is a game-changer. I can handle everything on the go!',
+              },
+            ].map((testimonial, index) => (
+              <motion.div
+                key={index}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-400 transition-all duration-300"
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <motion.div
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                    className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center"
+                  >
+                    <User size={24} className="text-blue-600" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold">{testimonial.name}</h3>
+                </div>
+                <p className="text-gray-600">{testimonial.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+  
       {/* Call to Action */}
-      <section className="py-20 px-6 relative overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 bg-purple-600 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 bg-green-500 rounded-full filter blur-3xl opacity-10"></div>
-        
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+      <section className="py-20 px-6 relative overflow-hidden bg-white">
+        <motion.div
+          className="absolute -top-40 -right-40 h-80 w-80 bg-blue-100 rounded-full filter blur-3xl opacity-10"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        ></motion.div>
+        <motion.div
+          className="absolute -bottom-40 -left-40 h-80 w-80 bg-blue-200 rounded-full filter blur-3xl opacity-10"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        ></motion.div>
+  
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center relative z-10"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to transform your social experience?</h2>
-          <p className="text-gray-300 mb-8">Join thousands who have already discovered a better way to connect online.</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Ready to Bank Smarter?</h2>
+          <p className="text-gray-600 mb-8">Join thousands of customers who trust Arigo Pay for their financial needs.</p>
           <motion.a
             href="/signup"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(29, 78, 216, 0.3)' }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-green-500 rounded-md text-lg font-medium hover:opacity-90 transition-all shadow-lg hover:shadow-purple-500/30"
+            className="inline-block px-8 py-4 bg-blue-600 text-white rounded-md text-lg font-medium shadow-md hover:bg-blue-700"
           >
-            Get Started Today
+            Open Your Account
           </motion.a>
         </motion.div>
       </section>
-
+  
       {/* Footer */}
-      <footer className="bg-black border-t border-gray-800 py-12 px-6">
+      <footer className="bg-gray-50 border-t border-gray-200 py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center space-x-2 mb-6 md:mb-0"
-            >
-              <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
-                <Sparkles size={18} className="text-white" />
+            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center space-x-2 mb-6 md:mb-0">
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <CreditCard size={18} className="text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-500 to-green-400 text-transparent bg-clip-text">Ijeuwa</span>
+              <span className="text-xl font-semibold text-blue-700">Arigo Pay</span>
             </motion.div>
-            
             <div className="flex space-x-8">
-              <motion.a 
-                whileHover={{ y: -2 }}
-                href="/privacy" 
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Privacy
+              <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="/privacy" className="text-gray-600">
+                Privacy Policy
               </motion.a>
-              <motion.a 
-                whileHover={{ y: -2 }}
-                href="/terms" 
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Terms
+              <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="/terms" className="text-gray-600">
+                Terms of Service
               </motion.a>
-              <motion.a 
-                whileHover={{ y: -2 }}
-                href="/contact" 
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Contact
+              <motion.a whileHover={{ y: -2, color: '#1d4ed8' }} href="/contact" className="text-gray-600">
+                Contact Us
               </motion.a>
             </div>
           </div>
           <div className="text-center md:text-left text-gray-500 text-sm mt-8">
-            © 2025 Ijeuwa. All rights reserved.
+            © 2025 Arigo Pay. All rights reserved.
           </div>
         </div>
       </footer>
     </div>
   );
+ 
 };
 
 export default LandingPage;
