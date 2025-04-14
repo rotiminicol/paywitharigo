@@ -11,7 +11,7 @@ const BankDashboard = () => {
   const accountDetails = {
     name: "John Doe",
     accountNumber: "0123456789",
-    balance: 25750.84,
+    balance: 259446643.9,
     currency: "₦",
   };
 
@@ -257,7 +257,7 @@ const BankDashboard = () => {
       >
         {/* Welcome Section with Balance Card */}
         <motion.div variants={item} className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Welcome back, John</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Welcome back, roti</h2>
           
           {/* Balance Card */}
           <motion.div 

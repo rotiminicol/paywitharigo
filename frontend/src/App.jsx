@@ -3,7 +3,6 @@ import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import SignUpPage from "./pages/auth/signup/SignUpPage";
 import Sidebar from "./components/common/Sidebar";
-import RightPanel from "./components/common/RightPanel";
 import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/LoadingSpinner";
@@ -12,7 +11,7 @@ import Verification from "./pages/Verification";
 import LandingPage from "./pages/LandingPage";
 
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import TransactionHistory from "./pages/TransactionsHistory";
+import TransactionsHistory from "./pages/TransactionsHistory";
 import Transfers from "./pages/Transfers";
 import Bills from "./pages/Bills";
 import Savings from "./pages/Savings";
@@ -25,6 +24,8 @@ import Security from "./pages/Security";
 import Settings from "./pages/Setting";
 
 function App() {
+  
+ 
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
@@ -46,14 +47,14 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-white">
+      <div className="h-screen flex justify-center items-center bg-black">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full bg-white">
+    <div className="flex h-screen w-full bg-gradient-to-br from-black to-purple-900">
       {authUser && <Sidebar />}
       <div className="flex-1 overflow-y-auto">
         <Routes>
@@ -66,21 +67,47 @@ function App() {
             path="/dashboard"
             element={authUser ? <HomePage /> : <Navigate to="/login" />}
           />
+       <Route path="/transaction-history" element={authUser ? <TransactionsHistory /> : <Navigate to="/login" />} />
           <Route
-            path="/transaction-history"
-            element={authUser ? <TransactionHistory/>: <Navigate to="/login" />}
+            path="/transfers"
+            element={authUser ? <Transfers /> : <Navigate to="/login" />}
           />
-            <Route path="/transfers" element={authUser ? <Transfers /> : <Navigate to="/login" />} />
-            <Route path="/payments" element={authUser ? <Bills/>:<Navigate to="/login" />} />
-            <Route path="/school-fees" element={authUser ? <SchoolFees /> : <Navigate to="/login" />} />
-            <Route path="/international" element={authUser ? <International /> : <Navigate to="/login" />} />
-            <Route path="/loans" element={authUser ? <Loans /> : <Navigate to="/login" />} />
-            <Route path="/savings" element={authUser ? <Savings /> : <Navigate to="/login" />} />
-            <Route path="/investments" element={authUser ? <Investments /> : <Navigate to="/login" />} />
-            <Route path="/cards" element={authUser ? <Cards /> : <Navigate to="/login" />} />
-            <Route path="/security" element={authUser ? <Security /> : <Navigate to="/login" />} />
-            <Route path="/settings" element={authUser ? <Settings /> : <Navigate to="/login" />} />
-       
+          <Route
+            path="/payments"
+            element={authUser ? <Bills /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/school-fees"
+            element={authUser ? <SchoolFees /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/international"
+            element={authUser ? <International /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/loans"
+            element={authUser ? <Loans /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/savings"
+            element={authUser ? <Savings /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/investments"
+            element={authUser ? <Investments /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/cards"
+            element={authUser ? <Cards /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/security"
+            element={authUser ? <Security /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/settings"
+            element={authUser ? <Settings /> : <Navigate to="/login" />}
+          />
           <Route
             path="/verification"
             element={authUser ? <Verification /> : <Navigate to="/login" />}
@@ -101,7 +128,6 @@ function App() {
           />
         </Routes>
       </div>
-      {authUser && <RightPanel />}
       <Toaster />
     </div>
   );
